@@ -22,11 +22,14 @@ const freightOrderSchema = new Schema({
   //['buy','sell']
   type: String,
   //['dealing','dealed']
-  status:String,
-  createTime:{ type: Date, default: Date.now },
-  origin:String,
-  destination:String,
-  dealedTime:String
+  status: String,
+  createTime: {
+    type: Date,
+    default: Date.now
+  },
+  origin: String,
+  destination: String,
+  dealedTime: String
 });
 
 //为模板绑定方法 检查用户是否可以注册
@@ -109,16 +112,15 @@ Api.post('/login', async(ctx) => {
   }
 
   await User
-    .findOne({username})
-    .then((e, res) => {
+    .findOne({username: String(username)})
+    .then((res) => {
       if (!res) {
         return ctx.body = {
           Status: 0,
           Message: '用户名不存在'
         };
       }
-
-      if (res.password !== password) {
+      if (res.password != password) {
         return ctx.body = {
           Status: 0,
           Message: '用户名或密码错误'
@@ -140,9 +142,7 @@ Api.post('/login', async(ctx) => {
 
 });
 
-Api.post('pubulishOrder',ctx=>{
-
-})
+Api.post('pubulishOrder', ctx => {})
 
 // 使用ctx.body解析中间件
 app.use(bodyParser());
