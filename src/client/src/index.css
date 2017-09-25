@@ -1,8 +1,9 @@
 
-html,body,.h100{
+html,body,.h100,.container{
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 .bottom-nav{

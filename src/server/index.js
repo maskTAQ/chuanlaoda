@@ -15,21 +15,33 @@ db.once('open', () => {
 mongoose.Promise = global.Promise;
 const Schema = mongoose.Schema;
 //初始化用户模板 包含三个field
-const userSchema = new Schema({username: String, password: String, email: String, wxId: String});
+const userSchema = new Schema({ username: String, password: String, email: String, wxId: String });
 
 const freightOrderSchema = new Schema({
   username: String,
-  //['buy','sell']
-  type: String,
-  //['dealing','dealed']
-  status: String,
+  //['找货','找船']
+  type: Number,
+  //['dealing','dealed','cancel']
+  status: Number,
+  //订单创建时间
   createTime: {
     type: Date,
     default: Date.now
   },
+  //出发地
   origin: String,
+  //终点
   destination: String,
-  dealedTime: String
+  //订单结算时间
+  dealedTime: String,
+  //货物类型
+  cargoType: String,
+  //货物重量/货船吨位
+  cargoTonnage: String,
+  //装货日期
+  shipmentTime: Date,
+  //备注
+  remarks: String,
 });
 
 //为模板绑定方法 检查用户是否可以注册
@@ -67,8 +79,8 @@ const app = new Koa();
 const Api = new Router();
 const router = new Router();
 
-Api.post('/register', async(ctx) => {
-  const {username, password, email, wxId} = ctx.request.body;
+Api.post('/register', async (ctx) => {
+  const { username, password, email, wxId } = ctx.request.body;
 
   if (!username || !password || !email) {
     ctx.body = {
@@ -82,7 +94,7 @@ Api.post('/register', async(ctx) => {
   //实例化用户
   const u = new User(ctx.request.body);
   await u
-  //检测用户是否能注册
+    //检测用户是否能注册
     .canRegister()
     .then(u.save())
     .then(() => {
@@ -100,8 +112,8 @@ Api.post('/register', async(ctx) => {
     })
 });
 
-Api.post('/login', async(ctx) => {
-  const {username, password, email, wxId} = ctx.request.body;
+Api.post('/login', async (ctx) => {
+  const { username, password, email, wxId } = ctx.request.body;
   if (!username || !password || !email) {
     ctx.body = {
       Status: 0,
@@ -112,7 +124,7 @@ Api.post('/login', async(ctx) => {
   }
 
   await User
-    .findOne({username: String(username)})
+    .findOne({ username: String(username) })
     .then((res) => {
       if (!res) {
         return ctx.body = {
@@ -142,7 +154,40 @@ Api.post('/login', async(ctx) => {
 
 });
 
-Api.post('pubulishOrder', ctx => {})
+Api.post('/pubulishCargo', async (ctx) => {
+  const { username, origin, destination, cargoType, cargoTonnage, shipmentTime, remarks } = ctx.request.body;
+
+  if (!username || !origin || !destination || !cargoType || !cargoTonnage || !shipmentTime) {
+    ctx.body = {
+      Status: 0,
+      Message: '请完整填写货物信息',
+      data: ctx.request.body
+    };
+    return
+  }
+
+  const freightOrderInfo = Object.assign(ctx.request.body, {
+    type: 1,//找船
+    status: 0,//发布
+    createTime: Date.now(),
+  });
+
+  const f = new FreightOrder(freightOrderInfo)
+  await f.save()
+    .then(res => {
+      ctx.body = {
+        Status: 1,
+        Message: '发布成功'
+      };
+    })
+    .catch(e => {
+      ctx.body = {
+        Status: 0,
+        Message: '发布失败',
+        data: e
+      };
+    })
+});
 
 // 使用ctx.body解析中间件
 app.use(bodyParser());
