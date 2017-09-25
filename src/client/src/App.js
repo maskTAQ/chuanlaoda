@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route} from 'react-router-dom'
 
 import styles from './index.css';
 
-import Home from 'components/home.js';
+import Home from 'page/home//home.js';
 import BottomNav from 'components/bottomNav.js';
 
 
