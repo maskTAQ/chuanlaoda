@@ -1,0 +1,29 @@
+::-webkit-input-placeholder {
+    /* WebKit browsers */
+    
+    color: #0a57b3!important;
+    font-size: 14px!important;
+}
+
+//时间选择器
+.ant-calendar-picker{
+    .ant-input{
+        background: none!important;
+     }
+     .ant-calendar-picker-icon:after{
+        color: #0a57b3!important;
+    }
+}
+
+.ant-btn{
+    background: none!important;
+    color: rgb(224, 235, 255) !important;
+    border: 1px solid #0a57b3 !important;
+    line-height: 12px;
+}
+.ant-time-picker-input,
+.ant-time-picker-icon:after {
+    color: rgb(224, 235, 255) !important;
+    background: transparent !important;
+    border: 1px solid #0a57b3 !important;
+}

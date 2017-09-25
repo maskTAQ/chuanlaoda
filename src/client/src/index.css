@@ -1,0 +1,12 @@
+
+html,body,.h100{
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.bottom-nav{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}

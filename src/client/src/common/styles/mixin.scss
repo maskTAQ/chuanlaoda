@@ -1,0 +1,9 @@
+// 背景图片
+@mixin bg-image($url) {
+  background-image: url('../../common/image/'+$url);
+  background-repeat: no-repeat;
+}
+@mixin transition($duration:1s){
+	transition: all $duration;
+	-webkit-transition: all $duration;
+}
