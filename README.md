@@ -10,5 +10,9 @@ react全家桶+scss+koa2+mongodb。
 * [介绍](README.md)
 * [配置环境](pei-zhi-huan-jing.md)
 * [第一天](first-day.md)
+
+## 注意
+1. material-ui的图标不显示需要手动引入
+2. material-ui BottomNavigation并不是在屏幕底部手动定位
  
 
