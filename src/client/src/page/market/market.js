@@ -3,9 +3,9 @@ import axios from 'axios';
 import { Dialog, FlatButton} from 'material-ui';
 import List from 'components/list/list.js';
 import { Api } from 'src/config.js';
-import styles from './home.scss';
+import styles from './market.scss';
 
-export default class Home extends Component {
+export default class MarKet extends Component {
     componentDidMount() {
         this.getData();
     }
@@ -44,7 +44,7 @@ export default class Home extends Component {
         switch (status) {
             case 'success':
                 return (
-                    <div className={styles.container} ref="containerList">
+                    <div className={styles.container}>
                         <List data={data} />
                     </div>
                 );
@@ -54,7 +54,7 @@ export default class Home extends Component {
                 );
             default:
                 return (
-                    <div className={styles.container} ref="containerList">
+                    <div className={styles.container}>
                         <Dialog
                             actions={actions}
                             modal={false}

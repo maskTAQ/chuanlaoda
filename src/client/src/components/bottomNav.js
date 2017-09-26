@@ -18,9 +18,14 @@ export default class BottomNav extends Component {
     state = {
         selectedIndex: 0
     };
+    componentWillMount() {
+        //链接进来校准路由
+        const pathMap = ['/home', '/market', '/me'];
+        this.setState({ selectedIndex: pathMap.indexOf(this.context.router.route.location.pathname) });
+    }
     link(path, index) {
         this.setState({ selectedIndex: index });
-        this.context.router.history.push({ pathname: '/home' })
+        this.context.router.history.push({ pathname: `/${path}` })
     }
     render() {
         return (
