@@ -1,2 +1,2 @@
 cd src/client
-yarn start
+npm start

@@ -87,7 +87,7 @@ Api.post('/register', async(ctx) => {
     ctx.body = {
       Status: 0,
       Message: '请完整填写注册信息',
-      data: ctx.request.body
+      Data: ctx.request.body
     };
     return
   }
@@ -108,7 +108,7 @@ Api.post('/register', async(ctx) => {
       ctx.body = {
         Status: 0,
         Message: '注册失败',
-        data: e
+        Data: e
       };
     })
 });
@@ -119,7 +119,7 @@ Api.post('/login', async(ctx) => {
     ctx.body = {
       Status: 0,
       Message: '请完整填写登录信息',
-      data: ctx.request.body
+      Data: ctx.request.body
     };
     return
   }
@@ -149,7 +149,7 @@ Api.post('/login', async(ctx) => {
       ctx.body = {
         Status: 0,
         Message: '登录失败',
-        data: e
+        Data: e
       };
     })
 
@@ -170,7 +170,7 @@ Api.post('/pubulishCargo', async(ctx) => {
     ctx.body = {
       Status: 0,
       Message: '请完整填写货物信息',
-      data: ctx.request.body
+      Data: ctx.request.body
     };
     return
   }
@@ -194,7 +194,7 @@ Api.post('/pubulishCargo', async(ctx) => {
       ctx.body = {
         Status: 0,
         Message: '发布失败',
-        data: e
+        Data: e
       };
     })
 });
@@ -203,12 +203,24 @@ Api.get('/getOrders', async(ctx) => {
   await FreightOrder
     .find()
     .then(orders => {
-      return ctx.body = orders
+      ctx.body = {
+        Status: 1,
+        Message: '',
+        Data: orders || []
+      };
+    })
+    .catch(e => {
+      ctx.body = {
+        Status: 0,
+        Message: '获取失败',
+        Data: e
+      };
     })
 })
 
 // 使用ctx.body解析中间件
 app.use(bodyParser());
+//允许跨域
 app.use(cors({
   origin: function (ctx) {
     return "*"; // 允许来自所有域名请求
