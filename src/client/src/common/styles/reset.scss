@@ -152,13 +152,14 @@ i {
     font-style: normal;
 }
 
-.clearfix:after {
+:global(.clearfix:after) {
     content: ".";
     display: block;
     height: 0;
     clear: both;
     visibility: hidden
-}
+  }
+
 
 button {
     border: none;

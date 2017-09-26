@@ -1,0 +1,1 @@
+supervisor --harmony src/server/index

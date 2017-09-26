@@ -5,7 +5,16 @@ html,body,.h100,.container{
   height: 100%;
   overflow: hidden;
 }
-
+.container{
+  position: relative;
+}
+.container-item{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom:56px;
+}
 .bottom-nav{
   position: absolute;
   width: 100%;

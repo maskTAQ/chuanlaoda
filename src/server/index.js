@@ -2,7 +2,7 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const mongoose = require('mongoose');
-
+const cors = require('koa2-cors');
 //连接数据库
 const db = mongoose.createConnection('mongodb://localhost/chuanlaoda');
 db.on('error', (e) => {
@@ -15,7 +15,7 @@ db.once('open', () => {
 mongoose.Promise = global.Promise;
 const Schema = mongoose.Schema;
 //初始化用户模板 包含三个field
-const userSchema = new Schema({ username: String, password: String, email: String, wxId: String });
+const userSchema = new Schema({username: String, password: String, email: String, wxId: String});
 
 const freightOrderSchema = new Schema({
   username: String,
@@ -41,7 +41,7 @@ const freightOrderSchema = new Schema({
   //装货日期
   shipmentTime: Date,
   //备注
-  remarks: String,
+  remarks: String
 });
 
 //为模板绑定方法 检查用户是否可以注册
@@ -70,6 +70,7 @@ userSchema.methods.canRegister = function () {
       });
   })
 };
+
 //用户模板实例化用户模型
 const User = db.model('User', userSchema);
 
@@ -79,8 +80,8 @@ const app = new Koa();
 const Api = new Router();
 const router = new Router();
 
-Api.post('/register', async (ctx) => {
-  const { username, password, email, wxId } = ctx.request.body;
+Api.post('/register', async(ctx) => {
+  const {username, password, email, wxId} = ctx.request.body;
 
   if (!username || !password || !email) {
     ctx.body = {
@@ -94,7 +95,7 @@ Api.post('/register', async (ctx) => {
   //实例化用户
   const u = new User(ctx.request.body);
   await u
-    //检测用户是否能注册
+  //检测用户是否能注册
     .canRegister()
     .then(u.save())
     .then(() => {
@@ -112,8 +113,8 @@ Api.post('/register', async (ctx) => {
     })
 });
 
-Api.post('/login', async (ctx) => {
-  const { username, password, email, wxId } = ctx.request.body;
+Api.post('/login', async(ctx) => {
+  const {username, password, email, wxId} = ctx.request.body;
   if (!username || !password || !email) {
     ctx.body = {
       Status: 0,
@@ -124,7 +125,7 @@ Api.post('/login', async (ctx) => {
   }
 
   await User
-    .findOne({ username: String(username) })
+    .findOne({username: String(username)})
     .then((res) => {
       if (!res) {
         return ctx.body = {
@@ -154,8 +155,16 @@ Api.post('/login', async (ctx) => {
 
 });
 
-Api.post('/pubulishCargo', async (ctx) => {
-  const { username, origin, destination, cargoType, cargoTonnage, shipmentTime, remarks } = ctx.request.body;
+Api.post('/pubulishCargo', async(ctx) => {
+  const {
+    username,
+    origin,
+    destination,
+    cargoType,
+    cargoTonnage,
+    shipmentTime,
+    remarks
+  } = ctx.request.body;
 
   if (!username || !origin || !destination || !cargoType || !cargoTonnage || !shipmentTime) {
     ctx.body = {
@@ -167,13 +176,14 @@ Api.post('/pubulishCargo', async (ctx) => {
   }
 
   const freightOrderInfo = Object.assign(ctx.request.body, {
-    type: 1,//找船
-    status: 0,//发布
-    createTime: Date.now(),
+    type: 1, //找船
+    status: 0, //发布
+    createTime: Date.now()
   });
 
   const f = new FreightOrder(freightOrderInfo)
-  await f.save()
+  await f
+    .save()
     .then(res => {
       ctx.body = {
         Status: 1,
@@ -189,8 +199,31 @@ Api.post('/pubulishCargo', async (ctx) => {
     })
 });
 
+Api.get('/getOrders', async(ctx) => {
+  await FreightOrder
+    .find()
+    .then(orders => {
+      return ctx.body = orders
+    })
+})
+
 // 使用ctx.body解析中间件
 app.use(bodyParser());
+app.use(cors({
+  origin: function (ctx) {
+    return "*"; // 允许来自所有域名请求
+    return 'http://localhost:8080'; // 这样就能只允许 http://localhost:8080 这个域名的请求了
+  },
+  exposeHeaders: [
+    'WWW-Authenticate', 'Server-Authorization'
+  ],
+  maxAge: 5,
+  credentials: true,
+  allowMethods: [
+    'GET', 'POST', 'DELETE'
+  ],
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 //挂载路由
 router.use('/api/v1', Api.routes(), Api.allowedMethods());
 app
