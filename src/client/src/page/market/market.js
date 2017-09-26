@@ -23,7 +23,7 @@ export default class MarKet extends Component {
         this.setState({ open: false });
     };
     addOrder=()=>{
-       alert('add')
+       console.log('add')
     }
     getData() {
         this.setState({ status: 'loading' });

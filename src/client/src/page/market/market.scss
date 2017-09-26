@@ -1,5 +1,6 @@
 $background:#3e4d68;
-
+$button-background:#57657e;
+$button-color:#d2d6dd;
 .container {
     position: relative;
     height: 100%;
@@ -8,6 +9,9 @@ $background:#3e4d68;
         position: absolute!important;
         right: 20px;
         bottom: 20px;
+        background: $button-background !important;
+        color: $button-color !important;
+        border-radius: 50%;
     }
 }
 
