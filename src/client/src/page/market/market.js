@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Dialog, FlatButton} from 'material-ui';
+import { Dialog, FlatButton, IconButton, FontIcon } from 'material-ui';
 import List from 'components/list/list.js';
 import { Api } from 'src/config.js';
 import styles from './market.scss';
@@ -22,6 +22,9 @@ export default class MarKet extends Component {
     handleClose = () => {
         this.setState({ open: false });
     };
+    addOrder=()=>{
+       alert('add')
+    }
     getData() {
         this.setState({ status: 'loading' });
         axios
@@ -46,6 +49,9 @@ export default class MarKet extends Component {
                 return (
                     <div className={styles.container}>
                         <List data={data} />
+                        <IconButton className={styles['add-order']} iconStyle={{ color: '#fff' }} onClick={this.addOrder}>
+                            <FontIcon className={`material-icons`}>add</FontIcon>
+                        </IconButton>
                     </div>
                 );
             case 'init':

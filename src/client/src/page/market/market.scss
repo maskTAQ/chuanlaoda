@@ -1,7 +1,13 @@
 $background:#3e4d68;
 
 .container {
+    position: relative;
     height: 100%;
     background: $background;
+    .add-order{
+        position: absolute!important;
+        right: 20px;
+        bottom: 20px;
+    }
 }
 
