@@ -1,32 +1,19 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import BScroll from 'better-scroll';
 import axios from 'axios';
-import {Dialog, FlatButton} from 'material-ui';
-import {Api} from 'src/config.js';
+import { Dialog, FlatButton, FontIcon } from 'material-ui';
+import moment from 'moment';
+
+import { Api } from 'src/config.js';
 import styles from './home.scss';
 
-console.log(Api)
 export default class Home extends Component {
-    static defaultProps = {
-        data: [
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1
-        ]
-    };
     componentDidMount() {
         this.getData();
     }
     componentDidUpdate() {
-        const {status} = this.state;
+        const { status } = this.state;
         if (status === 'success') {
             const dom = findDOMNode(this.refs.containerList);
             let scroll = new BScroll(dom);
@@ -40,31 +27,33 @@ export default class Home extends Component {
     };
 
     handleOpen = () => {
-        this.setState({open: true});
+        this.setState({ open: true });
     };
 
     handleClose = () => {
-        this.setState({open: false});
+        this.setState({ open: false });
     };
     getData() {
-        this.setState({status: 'loading'});
+        this.setState({ status: 'loading' });
         axios
             .get(`${Api}/getOrders`)
             .then(res => {
-                const {Data, Status, Message} = res.data;
+                const { Data, Status, Message } = res.data;
                 if (!Status) {
                     return this.handleOpen();
                 }
-                this.setState({status: 'success', data: Data});
+                this.setState({ status: 'success', data: Data });
             })
             .catch(e => {
                 this.handleOpen();
-                this.setState({status: 'error'});
+                this.setState({ status: 'error' });
             })
     }
     render() {
-        const {status, data} = this.state;
-        const actions = [(<FlatButton label="Cancel" primary={true} onClick={this.handleClose}/>), (<FlatButton label="Discard" primary={true} onClick={this.handleClose}/>)];
+        const { status, data } = this.state;
+        const actions = [(<FlatButton label="Cancel" primary={true} onClick={this.handleClose} />), (<FlatButton label="Discard" primary={true} onClick={this.handleClose} />)];
+
+        const typeMap = ['找货', '找船'];
 
         switch (status) {
             case 'success':
@@ -72,22 +61,33 @@ export default class Home extends Component {
                     <div className={styles.container} ref="containerList">
                         <ul className={styles.list} ref="list">
                             {data.map((item, i) => {
-                                const {
+                                let {
                                     origin,
                                     destination,
                                     cargoType,
                                     shipmentTime,
+                                    createTime,
+                                    cargoTonnage,
                                     type,
                                     _id
                                 } = item;
-                                console.log(item)
+                                shipmentTime = moment(createTime).format('M月D号');
                                 return (
                                     <li className={styles['list-item']} key={_id}>
-                                        <p className="title">
-                                            <i className="origin">{origin}</i>
-                                            <i className="destination">{destination}</i>
-                                            <i className="cargo">{shipmentTime}</i>
-                                        </p>
+                                        <div className={styles.title}>
+                                            <i className={styles.origin}>{origin}</i>
+                                            <FontIcon className="material-icons" style={{ color: '#56e8f7', lineHeight: '20px', fontSize: '18px' }}>chevron_right</FontIcon>
+                                            <i className={styles.destination}>{destination}</i>
+                                            <i className={[styles.tag, styles['cargot-type']].join(' ')}>{cargoType}</i>
+                                            <i className={[styles.tag, styles.type].join(' ')}>{typeMap[type]}</i>
+                                            <i className={[styles.tag, styles['cargo-tonnage']].join(' ')}>{cargoTonnage}吨</i>
+                                        </div>
+                                        <div className={styles.detail}>
+                                            <span>
+                                                <i className={styles.label}>装货日期: </i>
+                                                <i className={styles.valu}>{shipmentTime}</i>
+                                            </span>
+                                        </div>
                                     </li>
                                 )
                             })}

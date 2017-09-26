@@ -1,14 +1,48 @@
-$background:#596E91;
+$background:#3e4d68;
 $item-border-color:#2b3547;
+$tag-background:#57657e;
+$tag-color:#d2d6dd;
 .container {
     height: 100%;
     background: $background;
 }
 
 .list {
-    
     .list-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
         height: 88px;
         border-bottom: 1px solid $item-border-color;
+        .title{
+            display: flex;
+            justify-content: flex-start;
+            height: 20px;
+            line-height: 20px;
+            font-size: 14px;
+            color: #56e8f7;
+            
+            .origin{
+                color: #56e8f7;
+            }
+            .destination{
+                color: #56e8f7;
+            }
+            .tag{
+                margin: 0 4px;
+                padding: 0 4px;
+                background: $tag-background;
+                color: $tag-color;
+                font-size: 12px;
+            }
+        }
+        .detail{
+            height: 20px;
+            line-height: 24px;
+            color: #dff0f0;
+            font-size: 12px;
+            
+        }
     }
 }
