@@ -7,6 +7,8 @@ import Home from 'page/home/home.js';
 import Market from 'page/market/market.js';
 import BottomNav from 'components/bottomNav.js';
 
+import AddOrder from 'components/addOrder/addOrder.js';
+
 import './common/styles/reset.scss';
 import styles from './index.css';
 
@@ -22,7 +24,7 @@ class App extends Component {
           <div className={styles.container}>
             <div className={styles['container-item']}>
               <Route exact path="/home" component={Home}/>
-              <Route path="/market" component={Market}/>
+              <Route path="/market" component={AddOrder}/>
               <Route path="/me" component={Home}/>
             </div>
             <BottomNav/>

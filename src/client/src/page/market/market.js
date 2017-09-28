@@ -1,15 +1,19 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {unstable_renderSubtreeIntoContainer} from 'react-dom';
 import axios from 'axios';
 import {Dialog, FlatButton, IconButton, FontIcon} from 'material-ui';
+
+
 import List from 'components/list/list.js';
+import AddOrder from 'components/addOrder/addOrder.js';
 import {Api} from 'src/config.js';
 import styles from './market.scss';
 
 class MarKet extends Component {
     state = {
-        //提示框的显示状态
-        open: false,
+        //对话框的状态
+        isDialogVisible: true,
         //页面所需数据的状态
         status: 'init',
         //页面所需数据
@@ -31,30 +35,35 @@ class MarKet extends Component {
             });
         }
     }
+    componentDidMount() {
+        this.removeModal();
+    }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.orders.status === 'error') {
-            this.handleOpen();
+        const {status} = nextProps.orders;
+        //数据获取失败 提醒用户
+        if (status === 'error') {
+            this.setState({isDialogVisible: true});
         }
+
         this.setState({
             ...nextProps.orders
         });
     }
-    handleOpen = () => {
-        this.setState({open: true});
-    };
-
     handleClose = () => {
-        this.setState({open: false});
+        this.setState({isDialogVisible: false});
     };
-    retryGetOrders() {
+    retryGetOrders = () => {
         this.handleClose();
         this
             .props
             .getOrders();
     }
+    addOrder = () => {
+        this.renderModal((<AddOrder />));
+    }
+
     render() {
         const {status, data} = this.state;
-        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose}/>), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders}/>)];
         switch (status) {
             case 'success':
                 return (
@@ -76,19 +85,51 @@ class MarKet extends Component {
                     <p>{status}</p>
                 );
             default:
-                return (
-                    <div className={styles.container} ref="containerList">
-                        <Dialog
-                            actions={actions}
-                            modal={false}
-                            open={this.state.open}
-                            onRequestClose={this.handleClose}>
-                            数据加载失败,是否重试?
-                        </Dialog>
-                    </div>
-                )
+                return this.renderDialog();
         }
 
+    }
+    renderModal(child) {
+        /*
+        @param {parentComponent} 父组件
+        @param {nextElement} 要插入到DOM中的组件
+        @param{container} 要插入到的容器
+        @param {callback} 第一次渲染为null
+        */
+        if (!this.layerContainer) {
+            this.layerContainer = document.createElement('div');
+            this.layerContainer.id = 'layer';
+            Object.assign(this.layerContainer.style, {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background:'rgba(0,0,0,0.5)'
+            });
+            document
+                .body
+                .appendChild(this.layerContainer);
+        }
+        unstable_renderSubtreeIntoContainer(this, child, this.layerContainer);
+    }
+    removeModal = () => {
+        this.layerContainer && document
+            .body
+            .removeChild(this.layerContainer);
+    }
+    renderDialog() {
+        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose}/>), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders}/>)];
+
+        return (
+            <Dialog
+                actions={actions}
+                modal={true}
+                open={this.state.isDialogVisible}
+                onRequestClose={this.handleClose}>
+                数据加载失败,是否重试?
+            </Dialog>
+        );
     }
 }
 
