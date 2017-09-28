@@ -103,7 +103,8 @@ module.exports = {
       components: aliasResolve('src/components'),
       store: aliasResolve('src/store'),
       reducer: aliasResolve('src/reducer'),
-      dispatch: aliasResolve('src/dispatch')
+      dispatch: aliasResolve('src/dispatch'),
+      utils: aliasResolve('src/utils')
     },
     plugins: [// Prevents users from importing files from outside of src/ (or node_modules/).
       // This often causes confusion because we only process files within src/ with

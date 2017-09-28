@@ -85,7 +85,7 @@ export default class AddOrder extends Component {
         });
 
         if (stepIndex >= 4) {
-            this.props.onFinish();
+            this.props.onFinish(this.state);
         }
 
     };
@@ -148,9 +148,9 @@ export default class AddOrder extends Component {
     renderSelectType() {
         const { type } = this.state;
         let title = '找船或是找货';
-        if (type === 0) {
+        if (type === 1) {
             title = '我要找船';
-        } else if (type === 1) {
+        } else if (type === 0) {
             title = '我要找货';
         }
         return (
@@ -158,8 +158,8 @@ export default class AddOrder extends Component {
                 <StepLabel>{title}</StepLabel>
                 <StepContent>
                     <RadioButtonGroup name="type" valueSelected={type} onChange={this.onTypeChange}>
-                        <RadioButton value={0} label="找船" />
-                        <RadioButton value={1} label="找货" />
+                        <RadioButton value={0} label="找货" />
+                        <RadioButton value={1} label="找船" />
                     </RadioButtonGroup>
                     {this.renderStepActions()}
                 </StepContent>
@@ -171,7 +171,7 @@ export default class AddOrder extends Component {
         const dataSource = ['砂', '石子', '集装箱货物'];
         let title = '选择货物';
         if (cargoType) {
-            if (type === 0) {
+            if (type === 1) {
                 title = `帮我运${cargoType}`;
             } else {
                 title = `找${cargoType}`;

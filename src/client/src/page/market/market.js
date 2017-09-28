@@ -4,7 +4,7 @@ import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 import axios from 'axios';
 import { Dialog, FlatButton, IconButton, FontIcon } from 'material-ui';
 
-
+import paramStringify from 'utils/paramStringify.js';
 import List from 'components/list/list.js';
 import AddOrder from 'components/addOrder/addOrder.js';
 import { Api } from 'src/config.js';
@@ -58,8 +58,31 @@ class MarKet extends Component {
             .props
             .getOrders();
     }
-    addOrder = () => {
-        this.renderModal((<AddOrder onClose={this.removeModal} onFinish={() => { }} />));
+    showAddOrderModal = () => {
+        this.renderModal((<AddOrder onClose={this.removeModal} onFinish={this.addOrder} />));
+    }
+    addOrder = (data) => {
+        //发布找船信息
+        if (data.type === 1) {
+            axios
+                .post(`${Api}/pubulishCargo`, paramStringify(Object.assign(data,{username:'1'})))
+                .then(res => {
+                    const { Status, Message } = res.data;
+                    if (Status) {
+                        this.removeModal();
+                        this.props.getOrders();
+                    } else {
+                        alert(Message)
+                    }
+                })
+                .catch(e => {
+                    alert('发布失败')
+                })
+        }else{
+            alert('暂未实现找货功能')
+        }
+
+
     }
 
     render() {
@@ -74,7 +97,7 @@ class MarKet extends Component {
                             iconStyle={{
                                 color: '#fff'
                             }}
-                            onClick={this.addOrder}>
+                            onClick={this.showAddOrderModal}>
                             <FontIcon className={`material-icons`}>add</FontIcon>
                         </IconButton>
                     </div>
@@ -118,7 +141,7 @@ class MarKet extends Component {
             document
                 .body
                 .removeChild(this.layerContainer);
-                this.layerContainer = null;
+            this.layerContainer = null;
         }
 
     }
