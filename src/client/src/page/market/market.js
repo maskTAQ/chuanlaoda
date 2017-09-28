@@ -1,13 +1,13 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {unstable_renderSubtreeIntoContainer} from 'react-dom';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 import axios from 'axios';
-import {Dialog, FlatButton, IconButton, FontIcon} from 'material-ui';
+import { Dialog, FlatButton, IconButton, FontIcon } from 'material-ui';
 
 
 import List from 'components/list/list.js';
 import AddOrder from 'components/addOrder/addOrder.js';
-import {Api} from 'src/config.js';
+import { Api } from 'src/config.js';
 import styles from './market.scss';
 
 class MarKet extends Component {
@@ -22,7 +22,7 @@ class MarKet extends Component {
         message: ''
     };
     componentWillMount() {
-        const {status} = this.props.orders;
+        const { status } = this.props.orders;
         //如果store有数据就直接取 没有则获取
         if (status !== 'success') {
             this
@@ -39,10 +39,10 @@ class MarKet extends Component {
         this.removeModal();
     }
     componentWillReceiveProps(nextProps) {
-        const {status} = nextProps.orders;
+        const { status } = nextProps.orders;
         //数据获取失败 提醒用户
         if (status === 'error') {
-            this.setState({isDialogVisible: true});
+            this.setState({ isDialogVisible: true });
         }
 
         this.setState({
@@ -50,7 +50,7 @@ class MarKet extends Component {
         });
     }
     handleClose = () => {
-        this.setState({isDialogVisible: false});
+        this.setState({ isDialogVisible: false });
     };
     retryGetOrders = () => {
         this.handleClose();
@@ -59,21 +59,21 @@ class MarKet extends Component {
             .getOrders();
     }
     addOrder = () => {
-        this.renderModal((<AddOrder />));
+        this.renderModal((<AddOrder onClose={this.removeModal} onFinish={() => { }} />));
     }
 
     render() {
-        const {status, data} = this.state;
+        const { status, data } = this.state;
         switch (status) {
             case 'success':
                 return (
                     <div className={styles.container} ref="containerList">
-                        <List data={data}/>
+                        <List data={data} />
                         <IconButton
                             className={styles['add-order']}
                             iconStyle={{
-                            color: '#fff'
-                        }}
+                                color: '#fff'
+                            }}
                             onClick={this.addOrder}>
                             <FontIcon className={`material-icons`}>add</FontIcon>
                         </IconButton>
@@ -105,7 +105,7 @@ class MarKet extends Component {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                background:'rgba(0,0,0,0.5)'
+                background: 'rgba(0,0,0,0.5)'
             });
             document
                 .body
@@ -114,12 +114,16 @@ class MarKet extends Component {
         unstable_renderSubtreeIntoContainer(this, child, this.layerContainer);
     }
     removeModal = () => {
-        this.layerContainer && document
-            .body
-            .removeChild(this.layerContainer);
+        if (this.layerContainer) {
+            document
+                .body
+                .removeChild(this.layerContainer);
+                this.layerContainer = null;
+        }
+
     }
     renderDialog() {
-        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose}/>), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders}/>)];
+        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose} />), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders} />)];
 
         return (
             <Dialog
@@ -135,8 +139,8 @@ class MarKet extends Component {
 
 // Map Redux state to component props
 function mapStateToProps(state) {
-    const {orders} = state;
-    return {orders}
+    const { orders } = state;
+    return { orders }
 }
 
 // Map Redux actions to component props
@@ -152,7 +156,7 @@ function mapDispatchToProps(dispatch) {
             axios
                 .get(`${Api}/getOrders`)
                 .then(res => {
-                    const {Data, Status, Message} = res.data;
+                    const { Data, Status, Message } = res.data;
                     if (!Status) {
                         dispatch({
                             type: 'getOrders',

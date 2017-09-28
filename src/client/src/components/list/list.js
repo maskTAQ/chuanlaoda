@@ -10,7 +10,6 @@ import styles from './list.scss';
 
 export default class List extends Component {
     componentDidMount() {
-        console.log(1);
         const dom = findDOMNode(this.refs.listContainer);
         this.scroll = new BScroll(dom);
 
