@@ -104,9 +104,11 @@ export default class AddOrder extends Component {
     renderSelectType() {
         const {type} = this.state;
         let title = '找船或是找货';
-        type === 0
-            ? title = '我要找船'
-            : title = '我要找货';
+        if (type === 0) {
+            title = '我要找船';
+        } else if (type === 1) {
+            title = '我要找货';
+        }
         return (
             <Step>
                 <StepLabel>{title}</StepLabel>
@@ -139,6 +141,7 @@ export default class AddOrder extends Component {
                         floatingLabelText={`请输入你想${type === 0
                         ? '托运'
                         : '装载'}的货物`}
+                        searchText={cargoType}
                         filter={AutoComplete.noFilter}
                         dataSource={dataSource}
                         onUpdateInput={this.onCargoTypeChange}/>
