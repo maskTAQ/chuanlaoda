@@ -1,76 +1,147 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import axios from 'axios';
-import { Dialog, FlatButton, IconButton, FontIcon } from 'material-ui';
+import {Dialog, FlatButton, IconButton, FontIcon} from 'material-ui';
 import List from 'components/list/list.js';
-import { Api } from 'src/config.js';
+import {Api} from 'src/config.js';
 import styles from './market.scss';
 
-export default class MarKet extends Component {
-    componentDidMount() {
-        this.getData();
-    }
+class MarKet extends Component {
     state = {
+        //提示框的显示状态
         open: false,
+        //页面所需数据的状态
         status: 'init',
-        data: null
+        //页面所需数据
+        data: null,
+        //加载数据失败的原因
+        message: ''
     };
+    componentWillMount() {
+        const {status} = this.props.orders;
+        //如果store有数据就直接取 没有则获取
+        if (status !== 'success') {
+            this
+                .props
+                .getOrders();
 
+        } else {
+            this.setState({
+                ...this.props.orders
+            });
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.orders.status === 'error') {
+            this.handleOpen();
+        }
+        this.setState({
+            ...nextProps.orders
+        });
+    }
     handleOpen = () => {
-        this.setState({ open: true });
+        this.setState({open: true});
     };
 
     handleClose = () => {
-        this.setState({ open: false });
+        this.setState({open: false});
     };
-    addOrder=()=>{
-       console.log('add')
-    }
-    getData() {
-        this.setState({ status: 'loading' });
-        axios
-            .get(`${Api}/getOrders`)
-            .then(res => {
-                const { Data, Status, Message } = res.data;
-                if (!Status) {
-                    return this.handleOpen();
-                }
-                this.setState({ status: 'success', data: Data });
-            })
-            .catch(e => {
-                this.handleOpen();
-                this.setState({ status: 'error' });
-            })
+    retryGetOrders() {
+        this.handleClose();
+        this
+            .props
+            .getOrders();
     }
     render() {
-        const { status, data } = this.state;
-        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose} />), (<FlatButton label="重试" primary={true} onClick={this.handleClose} />)];
+        const {status, data} = this.state;
+        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose}/>), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders}/>)];
         switch (status) {
             case 'success':
                 return (
-                    <div className={styles.container}>
-                        <List data={data} />
-                        <IconButton className={styles['add-order']} iconStyle={{ color: '#fff' }} onClick={this.addOrder}>
+                    <div className={styles.container} ref="containerList">
+                        <List data={data}/>
+                        <IconButton
+                            className={styles['add-order']}
+                            iconStyle={{
+                            color: '#fff'
+                        }}
+                            onClick={this.addOrder}>
                             <FontIcon className={`material-icons`}>add</FontIcon>
                         </IconButton>
                     </div>
                 );
             case 'init':
+            case 'loading':
                 return (
                     <p>{status}</p>
                 );
             default:
                 return (
-                    <div className={styles.container}>
+                    <div className={styles.container} ref="containerList">
                         <Dialog
                             actions={actions}
                             modal={false}
                             open={this.state.open}
                             onRequestClose={this.handleClose}>
                             数据加载失败,是否重试?
-                         </Dialog>
+                        </Dialog>
                     </div>
                 )
         }
 
     }
 }
+
+// Map Redux state to component props
+function mapStateToProps(state) {
+    const {orders} = state;
+    return {orders}
+}
+
+// Map Redux actions to component props
+function mapDispatchToProps(dispatch) {
+    return {
+        getOrders() {
+            dispatch({
+                type: 'getOrders',
+                data: {
+                    status: 'loading'
+                }
+            });
+            axios
+                .get(`${Api}/getOrders`)
+                .then(res => {
+                    const {Data, Status, Message} = res.data;
+                    if (!Status) {
+                        dispatch({
+                            type: 'getOrders',
+                            data: {
+                                status: 'error',
+                                message: Message
+                            }
+                        });
+                        return
+                    }
+                    dispatch({
+                        type: 'getOrders',
+                        data: {
+                            status: 'success',
+                            data: Data
+                        }
+                    });
+                })
+                .catch(e => {
+
+                    dispatch({
+                        type: 'getOrders',
+                        data: {
+                            status: 'error',
+                            message: e.toString()
+                        }
+                    });
+                })
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MarKet)

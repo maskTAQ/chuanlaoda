@@ -1,11 +1,17 @@
 import {combineReducers} from 'redux';
 
 const rootReducer = combineReducers({
-    orders(state = false, action) {
-        const {type} = action;
-        if (type === 'TOGGLECOLLAPSED') {
-            return !state
+    orders(state = {}, action) {
+        const {type, data} = action;
+
+        if (type === 'getOrders') {
+            return Object.assign({}, state, data);
         }
+        return state
+    },
+    user(state = {}, action) {
+        //const {type, data} = action;
+
         return state
     }
 });
