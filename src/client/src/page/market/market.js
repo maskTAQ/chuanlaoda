@@ -62,25 +62,20 @@ class MarKet extends Component {
         this.renderModal((<AddOrder onClose={this.removeModal} onFinish={this.addOrder} />));
     }
     addOrder = (data) => {
-        //发布找船信息
-        if (data.type === 1) {
-            axios
-                .post(`${Api}/pubulishCargo`, paramStringify(Object.assign(data,{username:'1'})))
-                .then(res => {
-                    const { Status, Message } = res.data;
-                    if (Status) {
-                        this.removeModal();
-                        this.props.getOrders();
-                    } else {
-                        alert(Message)
-                    }
-                })
-                .catch(e => {
-                    alert('发布失败')
-                })
-        }else{
-            alert('暂未实现找货功能')
-        }
+        axios
+        .post(`${Api}/pubulishCargo`, paramStringify(Object.assign(data,{username:'1'})))
+        .then(res => {
+            const { Status, Message } = res.data;
+            if (Status) {
+                this.removeModal();
+                this.props.getOrders();
+            } else {
+                alert(Message)
+            }
+        })
+        .catch(e => {
+            alert('发布失败')
+        });
 
 
     }

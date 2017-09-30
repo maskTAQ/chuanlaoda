@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import {Dialog, FlatButton} from 'material-ui';
+
+import Slide from 'components/slide/slide.js';
 import List from 'components/list/list.js';
 import {Api} from 'src/config.js';
 import styles from './home.scss';
@@ -59,6 +61,7 @@ class Home extends Component {
             case 'success':
                 return (
                     <div className={styles.container} ref="containerList">
+                        <Slide/>
                         <List data={data}/>
                     </div>
                 );

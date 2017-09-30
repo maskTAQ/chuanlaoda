@@ -169,14 +169,13 @@ Api.post('/pubulishCargo', async(ctx) => {
   if (!username || !origin || !destination || !cargoType || !cargoTonnage || !shipmentTime) {
     ctx.body = {
       Status: 0,
-      Message: '请完整填写货物信息',
+      Message: '请完整填写货运信息',
       Data: ctx.request.body
     };
     return
   }
 
   const freightOrderInfo = Object.assign(ctx.request.body, {
-    type: 1, //找船
     status: 0, //发布
     createTime: Date.now()
   });

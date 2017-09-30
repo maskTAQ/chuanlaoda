@@ -23,6 +23,7 @@ class App extends Component {
         <Router>
           <div className={styles.container}>
             <div className={styles['container-item']}>
+              <Route exact path="/" component={Home}/>
               <Route exact path="/home" component={Home}/>
               <Route path="/market" component={Market}/>
               <Route path="/me" component={Home}/>
