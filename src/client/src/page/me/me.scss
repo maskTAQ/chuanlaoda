@@ -1,0 +1,75 @@
+.me-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.header {
+    position: relative;
+    height: 1.8rem;
+    background: #2babee;
+    .welcome {
+        text-align: center;
+        line-height: 1.0rem;
+        font-size: 0.18rem;
+        color: #fff;
+    }
+    .avatar {
+        position: absolute;
+        left: 50%;
+        bottom: -0.2rem;
+        margin-left: -0.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        border: 2px solid #fbfaf9;
+        background: url('https://b-ssl.duitang.com/uploads/item/201511/10/20151110101114_VBMA8.thumb.700_0.jpeg') no-repeat;
+        background-size: 100%;
+    }
+}
+
+.list {
+    flex: 1;
+    background: #eeeef0;
+    padding: 0 0.15rem;
+    .title {
+        height: 0.6rem;
+        line-height: 0.9rem;
+        text-align: center;
+        font-size: 0.12rem;
+        color: #1f2226;
+    }
+}
+
+.item {
+    margin: 0.1rem 0;
+    height: 0.72rem;
+    display: flex;
+    font-size: 0.14rem;
+    .border{
+        width: 3px;
+        background: #58dab4;
+        border-radius: 4px;
+    }
+    .content{
+        padding-left: 0.15rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        .username{
+            margin-right: 0.08rem;
+            color: #444447;
+        }
+        .time{
+            color: #8be5ca;
+        }
+        .bottom{
+            color: #CECED3;
+        }
+        .top,.bottom{
+            flex: 1;
+            line-height: 0.36rem;
+        }
+    }
+}

@@ -1,4 +1,10 @@
 .slide-container{
     height: 400px;
     border: 1px solid red;
+    .slide-wrapper{
+        height: 100%;
+    }
+    .slide-item{
+        height: 100%;
+    }
 }
