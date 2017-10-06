@@ -3,9 +3,19 @@
  * http://cssreset.com
  */
 
+//解决rem对material-ui.字体的影响
+div {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 16px;
+    font-weight: normal;
+    vertical-align: baseline;
+    box-sizing: border-box;
+}
+
 html,
 body,
-div,
 span,
 applet,
 object,
@@ -158,8 +168,7 @@ i {
     height: 0;
     clear: both;
     visibility: hidden
-  }
-
+}
 
 button {
     border: none;

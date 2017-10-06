@@ -10,7 +10,7 @@ export default class Me extends Component {
         unreadMessages: [{
             username: '游客',
             time: moment("20171005", "YYYYMMDD").fromNow(),
-            message: '关注了你发布的消息!'
+            message: '查看了你发布的消息!'
         },
         {
             username: '李先生',
@@ -23,7 +23,7 @@ export default class Me extends Component {
         return (
             <div className={styles['me-container']}>
                 <div className={styles.header}>
-                    <h2 className={styles.welcome}>你好,李先生!</h2>
+                    <h2 className={styles.welcome}>你好,老宋!</h2>
                     <div className={styles.avatar}></div>
                 </div>
                 {
