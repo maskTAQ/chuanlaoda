@@ -215,7 +215,23 @@ Api.get('/getOrders', async(ctx) => {
         Data: e
       };
     })
-})
+});
+Api.get('/test', async(ctx) => {
+  ctx.cookies.set(
+    'sign', 
+    ['hello world',1],
+    {
+      maxAge: 10 * 60 * 1000, // cookie有效时长
+      httpOnly: true,  // 是否只用于http请求中获取
+      overwrite: false  // 是否允许重写
+    }
+  )
+  ctx.body = {
+    Status: 0,
+    Message: '获取失败',
+    Data: ctx.cookies.get('sign')
+  };
+});
 
 // 使用ctx.body解析中间件
 app.use(bodyParser());

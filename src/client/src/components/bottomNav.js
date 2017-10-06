@@ -16,9 +16,15 @@ export default class BottomNav extends Component {
         }).isRequired
     }
     state = {
-        selectedIndex: 0
+        selectedIndex: 0,
+        //组件是否显示
+        visible: true
     };
+    componentWillUpdate() {
+        this.judgeVisible();
+    }
     componentWillMount() {
+        this.judgeVisible();
         //链接进来校准路由
         const pathMap = ['/home', '/market', '/me'];
         this.setState({ selectedIndex: pathMap.indexOf(this.context.router.route.location.pathname) });
@@ -27,7 +33,21 @@ export default class BottomNav extends Component {
         this.setState({ selectedIndex: index });
         this.context.router.history.push({ pathname: `/${path}` })
     }
+    judgeVisible() {
+        const pathMap = ['/home', '/market', '/me'];
+        const currentPath = this.context.router.route.location.pathname;
+        //如果不是map中定义的路径则隐藏nav
+        if (pathMap.indexOf(currentPath) === -1) {
+            this.setState({
+                visible: false
+            });
+        }
+    }
     render() {
+        const {visible} = this.state;
+        if(!visible){
+            return null
+        }
         return (
             <Paper zDepth={1} className={styles['bottom-nav']}>
                 <BottomNavigation selectedIndex={this.state.selectedIndex}>
