@@ -36,14 +36,23 @@ export default class BottomNav extends Component {
             // currentPath = this.context.router.route.location.pathname,
             currentPath = window.location.pathname,
             currentIndex = pathMap.indexOf(currentPath);
-        const { selectedIndex } = this.state;
+        const { selectedIndex,visible } = this.state;
         //如果不是map中定义的路径则隐藏nav
-        if (currentIndex === -1) {
-            this.setState({
-                visible: false
-            });
+        if(visible){
+            if (currentIndex === -1) {
+                this.setState({
+                    visible: false
+                });
+            } 
+        }else{
+            if (currentIndex > -1) {
+                this.setState({
+                    visible:true
+                });
+            } 
         }
-        console.log(selectedIndex, currentIndex, this.context.router, window.location.pathname)
+        
+        //同步nav的激活状态
         if (selectedIndex !== currentIndex) {
             this.setState({ selectedIndex: pathMap.indexOf(currentPath) });
         }

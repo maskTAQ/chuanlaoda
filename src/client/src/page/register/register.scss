@@ -1,4 +1,39 @@
-.container-register{
+.container-register {
     flex: 1;
-    border: 1px solid  red;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab {
+    margin: 0.2rem 0;
+    padding-left: 0.15rem;
+    display: flex;
+    height: 0.32rem;
+    line-height: 0.32rem;
+    border-left: 3px solid #ed2553;
+    
+    font-weight: bold;
+    .tab-item {
+        font-size: 0.22rem;
+        color: #796B6F;
+    }
+    .active{
+        color: #ed2553;
+    }
+    .boundary{
+        margin: 0 0.08rem;
+        color: #796B6F;
+    }
+}
+
+.content{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-left: 0.2rem;
+    overflow: auto;
+}
+.button{
+    margin: 0.15rem;
+    align-self: flex-end;
 }

@@ -15,7 +15,17 @@ db.once('open', () => {
 mongoose.Promise = global.Promise;
 const Schema = mongoose.Schema;
 //初始化用户模板 包含三个field
-const userSchema = new Schema({username: String, password: String, email: String, wxId: String});
+const userSchema = new Schema({
+  username: String,
+  password: String,
+  email: String,
+  phone: String,
+  wxId: String,
+  //船号
+  shipNumber: String,
+  //船载重
+  shipTonnage: Number
+});
 
 const freightOrderSchema = new Schema({
   username: String,
@@ -47,16 +57,19 @@ const freightOrderSchema = new Schema({
 //为模板绑定方法 检查用户是否可以注册
 userSchema.methods.canRegister = function () {
   return new Promise((resolve, reject) => {
+    const filtCondition = [{
+      'username': this.username
+    }];
+    if (this.email) {
+      filtCondition.push({
+        'email': this.email
+      });
+    }
+    
     this
       .model('User')
       .find({
-        $or: [
-          {
-            'email': this.email
-          }, {
-            'username': this.username
-          }
-        ]
+        $or: filtCondition
       })
       .exec((e, users) => {
         if (e) {
@@ -80,10 +93,10 @@ const app = new Koa();
 const Api = new Router();
 const router = new Router();
 
-Api.post('/register', async(ctx) => {
-  const {username, password, email, wxId} = ctx.request.body;
+Api.post('/register', async (ctx) => {
+  const { username, password, phone } = ctx.request.body;
 
-  if (!username || !password || !email) {
+  if (!username || !password || !phone) {
     ctx.body = {
       Status: 0,
       Message: '请完整填写注册信息',
@@ -95,7 +108,7 @@ Api.post('/register', async(ctx) => {
   //实例化用户
   const u = new User(ctx.request.body);
   await u
-  //检测用户是否能注册
+    //检测用户是否能注册
     .canRegister()
     .then(u.save())
     .then(() => {
@@ -113,8 +126,8 @@ Api.post('/register', async(ctx) => {
     })
 });
 
-Api.post('/login', async(ctx) => {
-  const {username, password, email, wxId} = ctx.request.body;
+Api.post('/login', async (ctx) => {
+  const { username, password, email, wxId } = ctx.request.body;
   if (!username || !password || !email) {
     ctx.body = {
       Status: 0,
@@ -125,7 +138,7 @@ Api.post('/login', async(ctx) => {
   }
 
   await User
-    .findOne({username: String(username)})
+    .findOne({ username: String(username) })
     .then((res) => {
       if (!res) {
         return ctx.body = {
@@ -139,6 +152,15 @@ Api.post('/login', async(ctx) => {
           Message: '用户名或密码错误'
         };
       }
+      ctx.cookies.set(
+        'sign',
+        true,
+        {
+          maxAge: 10 * 60 * 1000, // cookie有效时长
+          httpOnly: true,  // 是否只用于http请求中获取
+          overwrite: false  // 是否允许重写
+        }
+      );
       return ctx.body = {
         Status: 1,
         Message: '登录成功'
@@ -155,7 +177,7 @@ Api.post('/login', async(ctx) => {
 
 });
 
-Api.post('/pubulishCargo', async(ctx) => {
+Api.post('/pubulishCargo', async (ctx) => {
   const {
     username,
     origin,
@@ -198,7 +220,7 @@ Api.post('/pubulishCargo', async(ctx) => {
     })
 });
 
-Api.get('/getOrders', async(ctx) => {
+Api.get('/getOrders', async (ctx) => {
   await FreightOrder
     .find()
     .then(orders => {
@@ -216,10 +238,10 @@ Api.get('/getOrders', async(ctx) => {
       };
     })
 });
-Api.get('/test', async(ctx) => {
+Api.get('/test', async (ctx) => {
   ctx.cookies.set(
-    'sign', 
-    ['hello world',1],
+    'sign',
+    ['hello world', 1],
     {
       maxAge: 10 * 60 * 1000, // cookie有效时长
       httpOnly: true,  // 是否只用于http请求中获取
