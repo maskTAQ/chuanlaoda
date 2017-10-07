@@ -2,10 +2,10 @@ $background:#3e4d68;
 $button-background:#57657e;
 $button-color:#d2d6dd;
 .container {
+    flex: 1;
     position: relative;
-    height: 100%;
     background: $background;
-    .add-order{
+    .add-order {
         position: absolute!important;
         right: 20px;
         bottom: 20px;
@@ -14,4 +14,3 @@ $button-color:#d2d6dd;
         border-radius: 50%;
     }
 }
-

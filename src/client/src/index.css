@@ -5,7 +5,7 @@ html,body,.h100,.container{
   height: 100%;
   overflow: hidden;
 }
-.container{
+/* .container{
   position: relative;
 }
 .container-item{
@@ -19,4 +19,13 @@ html,body,.h100,.container{
   position: absolute;
   width: 100%;
   bottom: 0;
+} */
+.container{
+  display: flex;
+  flex-direction: column;
+}
+.container-item{
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }
