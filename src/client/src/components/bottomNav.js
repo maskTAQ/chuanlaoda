@@ -25,27 +25,33 @@ export default class BottomNav extends Component {
     }
     componentWillMount() {
         this.judgeVisible();
-        //链接进来校准路由
-        const pathMap = ['/home', '/market', '/me'];
-        this.setState({ selectedIndex: pathMap.indexOf(this.context.router.route.location.pathname) });
     }
     link(path, index) {
         this.setState({ selectedIndex: index });
         this.context.router.history.push({ pathname: `/${path}` })
     }
     judgeVisible() {
-        const pathMap = ['/home', '/market', '/me'];
-        const currentPath = this.context.router.route.location.pathname;
+        const pathMap = ['/home', '/market', '/me'],
+            //这里的路径再按返回键的时候不准确
+            // currentPath = this.context.router.route.location.pathname,
+            currentPath = window.location.pathname,
+            currentIndex = pathMap.indexOf(currentPath);
+        const { selectedIndex } = this.state;
         //如果不是map中定义的路径则隐藏nav
-        if (pathMap.indexOf(currentPath) === -1) {
+        if (currentIndex === -1) {
             this.setState({
                 visible: false
             });
         }
+        console.log(selectedIndex, currentIndex, this.context.router, window.location.pathname)
+        if (selectedIndex !== currentIndex) {
+            this.setState({ selectedIndex: pathMap.indexOf(currentPath) });
+        }
+
     }
     render() {
-        const {visible} = this.state;
-        if(!visible){
+        const { visible } = this.state;
+        if (!visible) {
             return null
         }
         return (
