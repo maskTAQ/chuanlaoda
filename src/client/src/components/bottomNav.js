@@ -37,6 +37,7 @@ export default class BottomNav extends Component {
             currentPath = window.location.pathname,
             currentIndex = pathMap.indexOf(currentPath);
         const { selectedIndex,visible } = this.state;
+
         //如果不是map中定义的路径则隐藏nav
         if(visible){
             if (currentIndex === -1) {
@@ -68,15 +69,15 @@ export default class BottomNav extends Component {
                 <BottomNavigation selectedIndex={this.state.selectedIndex}>
                     <BottomNavigationItem
                         label="首页"
-                        icon={<FontIcon className="material-icons">home</FontIcon>}
+                        icon={<FontIcon className="material-icons">&#xE88A;</FontIcon>}
                         onClick={() => this.link('home', 0)} />
                     <BottomNavigationItem
                         label="市场"
-                        icon={<FontIcon className="material-icons">shopping_cart</FontIcon>}
+                        icon={<FontIcon className="material-icons">&#xE8CC;</FontIcon>}
                         onClick={() => this.link('market', 1)} />
                     <BottomNavigationItem
                         label="我"
-                        icon={<FontIcon className="material-icons">face</FontIcon>}
+                        icon={<FontIcon className="material-icons">&#xE87C;</FontIcon>}
                         onClick={() => this.link('me', 2)} />
                 </BottomNavigation>
             </Paper>

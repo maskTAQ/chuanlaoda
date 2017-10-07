@@ -1,19 +1,38 @@
 .add-order-container {
-    border: 1px solid #fff;
     position: absolute;
     z-index: 2;
     top: 10px;
     left: 10px;
     right: 10px;
     bottom: 10px;
+    display: flex;
+    flex-direction: column;
     border-radius: 4px;
     background: #D3CCCC;
     .title {
         padding-left: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         i {
             font-size: 20px !important;
             line-height: 50px;
-            float: left;
+        }
+        .button-close {
+            margin-right: 0.2rem;
+        }
+    }
+    .content {
+        flex: 1;
+        overflow: auto;
+    }
+    .radio-container {
+        display: flex;
+        flex-direction: row;
+        padding-top: 10px;
+        padding-left: 10px;
+        .radio {
+            width: 50%!important;
         }
     }
 }

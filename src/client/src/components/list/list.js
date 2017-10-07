@@ -43,7 +43,7 @@ export default class List extends Component {
                                         color: '#56e8f7',
                                         lineHeight: '20px',
                                         fontSize: '18px'
-                                    }}>chevron_right</FontIcon>
+                                    }}>&#xE5CC;</FontIcon>
                                     <i className={styles.destination}>{destination}</i>
                                     <i className={[styles.tag, styles['cargot-type']].join(' ')}>{cargoType}</i>
                                     <i className={[styles.tag, styles.type].join(' ')}>{typeMap[type]}</i>

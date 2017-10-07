@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
-import { RaisedButton, FlatButton, AutoComplete, TextField, DatePicker, IconButton, Snackbar } from 'material-ui';
+import { RaisedButton, FlatButton, AutoComplete, TextField, DatePicker, FontIcon, Snackbar } from 'material-ui';
 import moment from 'moment';
+import classnames from 'classnames';
 
 import styles from './addOrder.scss';
 export default class AddOrder extends Component {
@@ -42,32 +43,32 @@ export default class AddOrder extends Component {
         const stepVerifyMap = {
             0: () => {
                 return {
-                    result:!isNaN(type),
-                    message:'请填写类型'
+                    result: !isNaN(type),
+                    message: '请填写类型'
                 };
             },
             1: () => {
                 return {
-                    result:!!cargoType,
-                    message:'请填写货物类型'
+                    result: !!cargoType,
+                    message: '请填写货物类型'
                 };
             },
             2: () => {
                 return {
-                    result:!!cargoTonnage,
-                    message:'请填写货物吨数'
+                    result: !!cargoTonnage,
+                    message: '请填写货物吨数'
                 };
             },
             3: () => {
                 return {
-                    result:!!origin && !!destination,
-                    message:'请填写航线'
+                    result: !!origin && !!destination,
+                    message: '请填写航线'
                 };
             },
             4: () => {
                 return {
-                    result:!!shipmentTime,
-                    message:'请填写载货时间'
+                    result: !!shipmentTime,
+                    message: '请填写载货时间'
                 };
             }
         }
@@ -75,7 +76,7 @@ export default class AddOrder extends Component {
         if (!verifyResult.result) {
             this.setState({
                 open: true,
-                alertMessage:verifyResult.message
+                alertMessage: verifyResult.message
             })
             return;
         }
@@ -157,9 +158,9 @@ export default class AddOrder extends Component {
             <Step>
                 <StepLabel>{title}</StepLabel>
                 <StepContent>
-                    <RadioButtonGroup name="type" valueSelected={type} onChange={this.onTypeChange}>
-                        <RadioButton value={0} label="找货" />
-                        <RadioButton value={1} label="找船" />
+                    <RadioButtonGroup name="type" valueSelected={type} onChange={this.onTypeChange} className={styles['radio-container']}>
+                        <RadioButton value={0} label="找货" className={styles.radio}/>
+                        <RadioButton value={1} label="找船" className={styles.radio} />
                     </RadioButtonGroup>
                     {this.renderStepActions()}
                 </StepContent>
@@ -248,68 +249,35 @@ export default class AddOrder extends Component {
                         onChange={this.handleTimeChange}
                         floatingLabelText="装货时间"
                         value={shipmentTime}
+                        okLabel="确定"
+                        cancelLabel="取消"
                     />
                     {this.renderStepActions()}
                 </StepContent>
             </Step>
         )
-
-        // if (type === 1) {
-        //     return (
-        //         <Step>
-        //             <StepLabel>选择时间</StepLabel>
-        //             <StepContent>
-        //                 <DatePicker
-        //                     onChange={this.handleChangeMinDate}
-        //                     autoOk={this.state.autoOk}
-        //                     floatingLabelText="起始时间"
-        //                     defaultDate={this.state.minDate}
-        //                     disableYearSelection={this.state.disableYearSelection} />
-        //                 <DatePicker
-        //                     onChange={this.handleChangeMinDate}
-        //                     autoOk={this.state.autoOk}
-        //                     floatingLabelText="截止时间"
-        //                     defaultDate={this.state.minDate}
-        //                     disableYearSelection={this.state.disableYearSelection} /> {this.renderStepActions()}
-        //             </StepContent>
-        //         </Step>
-        //     )
-        // } else {
-        //     return (
-        //         <Step>
-        //             <StepLabel>选择时间</StepLabel>
-        //             <StepContent>
-        //                 <DatePicker
-        //                     onChange={this.handleChangeMinDate}
-        //                     autoOk={this.state.autoOk}
-        //                     floatingLabelText="装货时间"
-        //                     defaultDate={this.state.minDate}
-        //                     disableYearSelection={this.state.disableYearSelection} /> {this.renderStepActions()}
-        //             </StepContent>
-        //         </Step>
-        //     )
-        // }
-
     }
     render() {
         const { stepIndex, open, alertMessage } = this.state;
         return (
             <div className={styles['add-order-container']}>
-                <h2 className={`${styles.title} clearfix`}>
+                <h2 className={styles.title}>
                     <i>发布信息</i>
-                    <IconButton onClick={this.props.onClose} iconClassName="material-icons" style={{ float: 'right', 'marginRight': '10px' }}>&#xE5CD;</IconButton>
+                    <FontIcon className={classnames('material-icons', styles['button-close'])} onClick={this.props.onClose}>&#xE5CD;</FontIcon>
                 </h2>
-                <Stepper activeStep={stepIndex} orientation="vertical">
-                    {this.renderSelectType()}
-                    {this.renderSelectCargoType()}
-                    {this.renderInputCargoTonnage()}
-                    {this.renderSelectLane()}
-                    {this.renderSelectTime()}
-                </Stepper>
+                <div className={styles['content']}>
+                    <Stepper activeStep={stepIndex} orientation="vertical">
+                        {this.renderSelectType()}
+                        {this.renderSelectCargoType()}
+                        {this.renderInputCargoTonnage()}
+                        {this.renderSelectLane()}
+                        {this.renderSelectTime()}
+                    </Stepper>
+                </div>
+
                 <Snackbar
                     open={open}
                     message={alertMessage}
-                    autoHideDuration={2000}
                     autoHideDuration={2000} onRequestClose={this.handleAlertRequestClose}
                 />
             </div>

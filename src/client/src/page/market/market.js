@@ -93,7 +93,7 @@ class MarKet extends Component {
                                 color: '#fff'
                             }}
                             onClick={this.showAddOrderModal}>
-                            <FontIcon className={`material-icons`}>add</FontIcon>
+                            <FontIcon className="material-icons">&#xE145;</FontIcon>
                         </IconButton>
                     </div>
                 );
