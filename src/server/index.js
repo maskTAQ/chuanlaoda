@@ -3,6 +3,7 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const mongoose = require('mongoose');
 const cors = require('koa2-cors');
+const Hashes = require('jshashes');
 //连接数据库
 const db = mongoose.createConnection('mongodb://localhost/chuanlaoda');
 db.on('error', (e) => {
@@ -157,18 +158,22 @@ Api.post('/login', async (ctx) => {
           Message: '用户名或密码错误'
         };
       }
+
       ctx.cookies.set(
-        'sign',
-        true,
+        'login_sign',
+        //Hexadecimal hash with HMAC salt key(_id).
+        new Hashes.SHA1().hex_hmac(res._id,`phone=${res.phone}&password=${res.password}`),
         {
           maxAge: 10 * 60 * 1000, // cookie有效时长
-          httpOnly: true,  // 是否只用于http请求中获取
+          httpOnly: false,  // 是否只用于http请求中获取
           overwrite: false  // 是否允许重写
         }
       );
+
       return ctx.body = {
         Status: 1,
-        Message: '登录成功'
+        Message: '登录成功',
+        data:ctx.cookies.get('login_sign') || 12
       };
 
     })
@@ -243,22 +248,7 @@ Api.get('/getOrders', async (ctx) => {
       };
     })
 });
-Api.get('/test', async (ctx) => {
-  ctx.cookies.set(
-    'sign',
-    ['hello world', 1],
-    {
-      maxAge: 10 * 60 * 1000, // cookie有效时长
-      httpOnly: true,  // 是否只用于http请求中获取
-      overwrite: false  // 是否允许重写
-    }
-  )
-  ctx.body = {
-    Status: 0,
-    Message: '获取失败',
-    Data: ctx.cookies.get('sign')
-  };
-});
+
 
 // 使用ctx.body解析中间件
 app.use(bodyParser());
@@ -279,10 +269,14 @@ app.use(cors({
   allowHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 //挂载路由
-router.use('/api/v1', Api.routes(), Api.allowedMethods());
+router.use('/api/v1', function (ctx, next) {
+  console.log(ctx.cookies.get('login_sign'))
+  return next();
+})
+.use('/api/v1', Api.routes(), Api.allowedMethods());
 app
   .use(router.routes())
   .use(router.allowedMethods());
 
 app.listen(8080);
-console.log('[demo] start-quick is starting at port 3000')
+console.log('[demo] start-quick is starting at port 8080')

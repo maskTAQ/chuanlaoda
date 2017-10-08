@@ -17,6 +17,7 @@
     "koa2-cors": "^2.0.3"
   },
   "devDependencies": {
+    "jshashes": "^1.0.7",
     "mongoose": "^4.11.12"
   }
 }
