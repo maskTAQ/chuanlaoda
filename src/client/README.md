@@ -1,8 +1,7 @@
 # set-cookie不生效
-Q:
-当我在服务端设置cookie时,浏览器并不能读到cookie或在下次请求时没有携带对应的cookie信息。服务端和网站在不同的域,之前只做了允许所有请求。
-A:
-当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
+Q:当我在服务端设置cookie时,浏览器并不能读到cookie或在下次请求时没有携带对应的cookie信息。服务端和网站在不同的域,之前只做了允许所有请求。
+
+A:当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
 该属性有3个值：
 omit: 默认属性，不允许其他域发送cookie
 same-origin: 只允许同域发送cookie
