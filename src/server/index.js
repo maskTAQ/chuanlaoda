@@ -65,7 +65,7 @@ userSchema.methods.canRegister = function () {
         'email': this.email
       });
     }
-    
+
     this
       .model('User')
       .find({
@@ -127,8 +127,13 @@ Api.post('/register', async (ctx) => {
 });
 
 Api.post('/login', async (ctx) => {
-  const { username, password, email, wxId } = ctx.request.body;
-  if (!username || !password || !email) {
+  const { phone, password, email } = ctx.request.body;
+  const searchCondition = {};
+  if (phone && password) {
+    searchCondition.phone = phone;
+  } else if (email && password) {
+    searchCondition.email = email;
+  } else {
     ctx.body = {
       Status: 0,
       Message: '请完整填写登录信息',
@@ -138,12 +143,12 @@ Api.post('/login', async (ctx) => {
   }
 
   await User
-    .findOne({ username: String(username) })
+    .findOne(searchCondition)
     .then((res) => {
       if (!res) {
         return ctx.body = {
           Status: 0,
-          Message: '用户名不存在'
+          Message: '用户不存在'
         };
       }
       if (res.password != password) {
