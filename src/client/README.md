@@ -17,7 +17,7 @@ axios配置
       withCredentials: 'credentials'
   })
 ```
-同时需要在服务端配置域名白名单,不能设置'*'为报错
+同时需要在服务端配置域名白名单,不能设置'*',这样请求会报错。
 ```js
 app.use(cors({
   origin: function (ctx) {
