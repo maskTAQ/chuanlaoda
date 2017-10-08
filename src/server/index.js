@@ -255,8 +255,7 @@ app.use(bodyParser());
 //允许跨域
 app.use(cors({
   origin: function (ctx) {
-    return "*"; // 允许来自所有域名请求
-    return 'http://localhost:8080'; // 这样就能只允许 http://localhost:8080 这个域名的请求了
+    return 'http://localhost:3000'; // 这样就能只允许 http://localhost:3000 这个域名的请求了
   },
   exposeHeaders: [
     'WWW-Authenticate', 'Server-Authorization'
@@ -270,7 +269,7 @@ app.use(cors({
 }));
 //挂载路由
 router.use('/api/v1', function (ctx, next) {
-  console.log(ctx.cookies.get('login_sign'))
+  console.log(ctx.cookies.get('login_sign',12))
   return next();
 })
 .use('/api/v1', Api.routes(), Api.allowedMethods());

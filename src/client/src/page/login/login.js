@@ -19,16 +19,20 @@ export default class Login extends Component {
         const verifyResult = this.verifyValue();
         if (verifyResult) {
             axios
-                .post(`${Api}/login`, paramStringify(this.state))
+                .post(`${Api}/login`, paramStringify(this.state),{
+                    //当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
+                    withCredentials: 'credentials'
+                })
                 .then(res => {
                     const { Status, Message } = res.data;
                     if (Status) {
-                        this.props.history.push('/home');
+                        //this.props.history.push('/home');
                     } else {
                         alert(Message)
                     }
                 })
                 .catch(e => {
+                    console.log(e)
                     alert('注册失败')
                 });
         }
