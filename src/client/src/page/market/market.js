@@ -80,14 +80,13 @@ class MarKet extends Component {
 
 
     }
-
     render() {
         const { status, data } = this.state;
         switch (status) {
             case 'success':
                 return (
                     <div className={styles.container} ref="containerList">
-                        <List data={data} />
+                        <List data={data} scrollDown={() => { this.props.toggleBottomNav('show') }} scrollUp={() => { this.props.toggleBottomNav('hide') }} />
                         <IconButton
                             className={styles['add-order']}
                             iconStyle={{
@@ -204,6 +203,12 @@ function mapDispatchToProps(dispatch) {
                         }
                     });
                 })
+        },
+        toggleBottomNav(type) {
+            dispatch({
+                type: 'toggleBottomNav', 
+                data:type
+            });
         }
     }
 }

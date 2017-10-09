@@ -1,18 +1,26 @@
-import {combineReducers} from 'redux';
+import { combineReducers } from 'redux';
 
 const rootReducer = combineReducers({
     orders(state = {}, action) {
-        const {type, data} = action;
+        const { type, data } = action;
 
         if (type === 'getOrders') {
             return Object.assign({}, state, data);
         }
-        return state
+        return state;
     },
     user(state = {}, action) {
         //const {type, data} = action;
 
-        return state
+        return state;
+    },
+    isBottomNavVisible(state = true, action) {
+        const { type, data } = action;
+        if (type === 'toggleBottomNav') {
+            return data === 'show';
+        }
+
+        return state;
     }
 });
 

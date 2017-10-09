@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-
+import { connect } from 'react-redux';
 import { FontIcon, Paper } from 'material-ui';
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
 
 import styles from 'src/index.css';
 
-export default class BottomNav extends Component {
+class BottomNav extends Component {
     static contextTypes = {
         router: PropTypes.shape({
             history: PropTypes.shape({
@@ -61,7 +61,8 @@ export default class BottomNav extends Component {
     }
     render() {
         const { visible } = this.state;
-        if (!visible) {
+        const {isBottomNavVisible} = this.props;
+        if (!visible || !isBottomNavVisible) {
             return null
         }
         return (
@@ -84,3 +85,10 @@ export default class BottomNav extends Component {
         )
     }
 }
+
+// Map Redux state to component props
+function mapStateToProps(state) {
+    const {  isBottomNavVisible } = state;
+    return { isBottomNavVisible }
+}
+export default connect(mapStateToProps)(BottomNav)

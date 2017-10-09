@@ -6,5 +6,6 @@ export default {
     user:{
         status:'init',
         data:null
-    }
+    },
+    isBottomNavVisible:true
 }
