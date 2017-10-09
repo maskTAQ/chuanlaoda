@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import { Dialog, FlatButton } from 'material-ui';
 
-import Slide from 'components/slide/slide.js';
+import Loading from 'components/loading/loading.js';
 import List from 'components/list/list.js';
 import { Api } from 'src/config.js';
 import styles from './home.scss';
@@ -70,7 +70,7 @@ class Home extends Component {
             case 'init':
             case 'loading':
                 return (
-                    <p>{status}</p>
+                    <Loading label={status} />
                 );
             default:
                 return (

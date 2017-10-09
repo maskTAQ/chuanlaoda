@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Dialog, FlatButton, IconButton, FontIcon } from 'material-ui';
 
 import paramStringify from 'utils/paramStringify.js';
+import Loading from 'components/loading/loading.js';
 import List from 'components/list/list.js';
 import AddOrder from 'components/addOrder/addOrder.js';
 import { Api } from 'src/config.js';
@@ -63,19 +64,19 @@ class MarKet extends Component {
     }
     addOrder = (data) => {
         axios
-        .post(`${Api}/pubulishCargo`, paramStringify(Object.assign(data,{username:'1'})))
-        .then(res => {
-            const { Status, Message } = res.data;
-            if (Status) {
-                this.removeModal();
-                this.props.getOrders();
-            } else {
-                alert(Message)
-            }
-        })
-        .catch(e => {
-            alert('发布失败')
-        });
+            .post(`${Api}/pubulishCargo`, paramStringify(Object.assign(data, { username: '1' })))
+            .then(res => {
+                const { Status, Message } = res.data;
+                if (Status) {
+                    this.removeModal();
+                    this.props.getOrders();
+                } else {
+                    alert(Message)
+                }
+            })
+            .catch(e => {
+                alert('发布失败')
+            });
 
 
     }
@@ -100,7 +101,7 @@ class MarKet extends Component {
             case 'init':
             case 'loading':
                 return (
-                    <p>{status}</p>
+                    <Loading label={status} />
                 );
             default:
                 return this.renderDialog();

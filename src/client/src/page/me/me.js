@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 
+import Loading from 'components/loading/loading.js';
 import styles from './me.scss';
 moment.locale('zh-cn');
 export default class Me extends Component {
