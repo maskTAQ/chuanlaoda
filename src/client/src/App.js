@@ -9,7 +9,7 @@ import Market from 'page/market/market.js';
 import Me from 'page/me/me.js';
 import Register from 'page/register/register.js';
 
-import BottomNav from 'components/bottomNav.js';
+import BottomNav from 'components/bottomNav/bottomNav.js';
 
 //import AddOrder from 'components/addOrder/addOrder.js';
 

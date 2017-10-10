@@ -255,7 +255,8 @@ app.use(bodyParser());
 //允许跨域
 app.use(cors({
   origin: function (ctx) {
-    return 'http://localhost:3000'; // 这样就能只允许 http://localhost:3000 这个域名的请求了
+    return '*';
+    return 'http://localhost:3000,http://192.168.1.155:3000,http://192.168.0.101:3000,www.deepskyblue.cn:3000'; // 这样就能只允许 http://localhost:3000 这个域名的请求了
   },
   exposeHeaders: [
     'WWW-Authenticate', 'Server-Authorization'

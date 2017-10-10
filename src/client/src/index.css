@@ -27,5 +27,6 @@ html,body,.h100,.container{
 .container-item{
   flex: 1;
   display: flex;
+  position: relative;/* 用于底部导航显示隐藏定位 */
   overflow: hidden;
 }

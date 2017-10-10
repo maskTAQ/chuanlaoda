@@ -5,7 +5,7 @@ import { FontIcon, Paper } from 'material-ui';
 import { Motion, spring } from 'react-motion';
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
 
-import styles from './bottomNav.css';
+import styles from './bottomNav.scss';
 
 class BottomNav extends Component {
     static contextTypes = {
@@ -20,12 +20,22 @@ class BottomNav extends Component {
     state = {
         selectedIndex: 0,
         //组件是否显示
-        visible: true
+        visible: true,
+        //上一个按钮可见的状态
+        prevIsBottomNavVisible:''
     };
-    componentWillUpdate() {
+    componentWillUpdate(nextProps,nextState) {
+        if(this.props.isBottomNavVisible !== nextProps.isBottomNavVisible){
+            //每次导航条状态改变时 合并到state中
+            nextState.prevIsBottomNavVisible=this.props.isBottomNavVisible
+        }
+        
         this.judgeVisible();
     }
     componentWillMount() {
+        this.setState({
+            prevIsBottomNavVisible:this.props.isBottomNavVisible
+        });
         this.judgeVisible();
     }
     link(path, index) {
@@ -62,28 +72,34 @@ class BottomNav extends Component {
 
     }
     render() {
-        const { visible } = this.state;
+        const {visible} = this.state;
         const {isBottomNavVisible} = this.props;
-        if (!visible || !isBottomNavVisible) {
+        const bottom = isBottomNavVisible
+            ? 0
+            : -56;
+        
+        if (!visible) {
             return null
         }
+        
         return (
-            <Paper zDepth={1} className={styles['bottom-nav']}>
-                <BottomNavigation selectedIndex={this.state.selectedIndex}>
-                    <BottomNavigationItem
-                        label="首页"
-                        icon={<FontIcon className="material-icons">&#xE88A;</FontIcon>}
-                        onClick={() => this.link('home', 0)} />
-                    <BottomNavigationItem
-                        label="市场"
-                        icon={<FontIcon className="material-icons">&#xE8CC;</FontIcon>}
-                        onClick={() => this.link('market', 1)} />
-                    <BottomNavigationItem
-                        label="我"
-                        icon={<FontIcon className="material-icons">&#xE87C;</FontIcon>}
-                        onClick={() => this.link('me', 2)} />
-                </BottomNavigation>
+            <Paper zDepth={1} className={styles['bottom-nav']} style={{bottom:`${bottom}px`}}>
+            <BottomNavigation selectedIndex={this.state.selectedIndex}>
+                <BottomNavigationItem
+                    label="首页"
+                    icon={<FontIcon className="material-icons">&#xE88A;</FontIcon>}
+                    onClick={() => this.link('home', 0)} />
+                <BottomNavigationItem
+                    label="市场"
+                    icon={<FontIcon className="material-icons">&#xE8CC;</FontIcon>}
+                    onClick={() => this.link('market', 1)} />
+                <BottomNavigationItem
+                    label="我"
+                    icon={<FontIcon className="material-icons">&#xE87C;</FontIcon>}
+                    onClick={() => this.link('me', 2)} />
+            </BottomNavigation>
             </Paper>
+            
         )
     }
 }
