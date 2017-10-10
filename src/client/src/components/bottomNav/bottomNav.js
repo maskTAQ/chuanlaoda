@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FontIcon, Paper } from 'material-ui';
-import { Motion, spring } from 'react-motion';
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
 
 import styles from './bottomNav.scss';

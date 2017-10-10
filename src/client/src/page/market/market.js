@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { unstable_renderSubtreeIntoContainer } from 'react-dom';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {unstable_renderSubtreeIntoContainer} from 'react-dom';
 import axios from 'axios';
-import { Dialog, FlatButton, IconButton, FontIcon } from 'material-ui';
+import {Dialog, FlatButton, IconButton, FontIcon} from 'material-ui';
 
 import paramStringify from 'utils/paramStringify.js';
 import Loading from 'components/loading/loading.js';
+import SearchBar from 'components/searchBar/searchBar.js';
 import List from 'components/list/list.js';
 import AddOrder from 'components/addOrder/addOrder.js';
-import { Api } from 'src/config.js';
+import {Api} from 'src/config.js';
 import styles from './market.scss';
 
 class MarKet extends Component {
@@ -23,7 +24,7 @@ class MarKet extends Component {
         message: ''
     };
     componentWillMount() {
-        const { status } = this.props.orders;
+        const {status} = this.props.orders;
         //如果store有数据就直接取 没有则获取
         if (status !== 'success') {
             this
@@ -40,10 +41,10 @@ class MarKet extends Component {
         this.removeModal();
     }
     componentWillReceiveProps(nextProps) {
-        const { status } = nextProps.orders;
+        const {status} = nextProps.orders;
         //数据获取失败 提醒用户
         if (status === 'error') {
-            this.setState({ isDialogVisible: true });
+            this.setState({isDialogVisible: true});
         }
 
         this.setState({
@@ -51,7 +52,7 @@ class MarKet extends Component {
         });
     }
     handleClose = () => {
-        this.setState({ isDialogVisible: false });
+        this.setState({isDialogVisible: false});
     };
     retryGetOrders = () => {
         this.handleClose();
@@ -60,16 +61,18 @@ class MarKet extends Component {
             .getOrders();
     }
     showAddOrderModal = () => {
-        this.renderModal((<AddOrder onClose={this.removeModal} onFinish={this.addOrder} />));
+        this.renderModal((<AddOrder onClose={this.removeModal} onFinish={this.addOrder}/>));
     }
     addOrder = (data) => {
         axios
-            .post(`${Api}/pubulishCargo`, paramStringify(Object.assign(data, { username: '1' })))
+            .post(`${Api}/pubulishCargo`, paramStringify(Object.assign(data, {username: '1'})))
             .then(res => {
-                const { Status, Message } = res.data;
+                const {Status, Message} = res.data;
                 if (Status) {
                     this.removeModal();
-                    this.props.getOrders();
+                    this
+                        .props
+                        .getOrders();
                 } else {
                     alert(Message)
                 }
@@ -78,20 +81,32 @@ class MarKet extends Component {
                 alert('发布失败')
             });
 
-
     }
     render() {
-        const { status, data } = this.state;
+        const {status, data} = this.state;
+        const {isBottomNavVisible} = this.props;
         switch (status) {
             case 'success':
                 return (
                     <div className={styles.container} ref="containerList">
-                        <List data={data} scrollDown={() => { this.props.toggleBottomNav('show') }} scrollUp={() => { this.props.toggleBottomNav('hide') }} />
+                        <SearchBar isVisible={!isBottomNavVisible}/>
+                        <List
+                            data={data}
+                            scrollDown={() => {
+                            this
+                                .props
+                                .toggleBottomNav('show');
+                        }}
+                            scrollUp={() => {
+                            this
+                                .props
+                                .toggleBottomNav('hide');
+                        }}/>
                         <IconButton
                             className={styles['add-order']}
                             iconStyle={{
-                                color: '#fff'
-                            }}
+                            color: '#fff'
+                        }}
                             onClick={this.showAddOrderModal}>
                             <FontIcon className="material-icons">&#xE145;</FontIcon>
                         </IconButton>
@@ -99,9 +114,7 @@ class MarKet extends Component {
                 );
             case 'init':
             case 'loading':
-                return (
-                    <Loading label={status} />
-                );
+                return (<Loading label={status}/>);
             default:
                 return this.renderDialog();
         }
@@ -141,7 +154,7 @@ class MarKet extends Component {
 
     }
     renderDialog() {
-        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose} />), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders} />)];
+        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose}/>), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders}/>)];
 
         return (
             <Dialog
@@ -157,8 +170,8 @@ class MarKet extends Component {
 
 // Map Redux state to component props
 function mapStateToProps(state) {
-    const { orders } = state;
-    return { orders }
+    const {orders,isBottomNavVisible} = state;
+    return {orders,isBottomNavVisible}
 }
 
 // Map Redux actions to component props
@@ -174,7 +187,7 @@ function mapDispatchToProps(dispatch) {
             axios
                 .get(`${Api}/getOrders`)
                 .then(res => {
-                    const { Data, Status, Message } = res.data;
+                    const {Data, Status, Message} = res.data;
                     if (!Status) {
                         dispatch({
                             type: 'getOrders',
@@ -205,10 +218,7 @@ function mapDispatchToProps(dispatch) {
                 })
         },
         toggleBottomNav(type) {
-            dispatch({
-                type: 'toggleBottomNav', 
-                data:type
-            });
+            dispatch({type: 'toggleBottomNav', data: type});
         }
     }
 }
