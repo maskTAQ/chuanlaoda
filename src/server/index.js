@@ -4,6 +4,7 @@ const bodyParser = require('koa-bodyparser');
 const mongoose = require('mongoose');
 const cors = require('koa2-cors');
 const Hashes = require('jshashes');
+const axios = require('axios');
 //连接数据库
 const db = mongoose.createConnection('mongodb://localhost/chuanlaoda');
 db.on('error', (e) => {
@@ -162,7 +163,7 @@ Api.post('/login', async (ctx) => {
       ctx.cookies.set(
         'login_sign',
         //Hexadecimal hash with HMAC salt key(_id).
-        new Hashes.SHA1().hex_hmac(res._id,`phone=${res.phone}&password=${res.password}`),
+        new Hashes.SHA1().hex_hmac(res._id, `phone=${res.phone}&password=${res.password}`),
         {
           maxAge: 10 * 60 * 1000, // cookie有效时长
           httpOnly: false,  // 是否只用于http请求中获取
@@ -173,7 +174,7 @@ Api.post('/login', async (ctx) => {
       return ctx.body = {
         Status: 1,
         Message: '登录成功',
-        data:ctx.cookies.get('login_sign') || 12
+        data: ctx.cookies.get('login_sign') || 12
       };
 
     })
@@ -249,7 +250,111 @@ Api.get('/getOrders', async (ctx) => {
     })
 });
 
+const imConfig = {
+  AppKey: '07a2803dfb55990e11cabe61b768c8e7',
+  AppSecret: 'e938e3bed7d8',
+  Nonce: 'test'
+}
+var SHA1 = new Hashes.SHA1;
+const paramStringify = (data) => {
+  let url = '';
+  for (let k in data) {
+    let value = data[k] !== undefined
+      ? data[k]
+      : '';
+    url += `&${k}=${encodeURIComponent(value)}`
+  }
 
+  //去掉第一个参数的&符号
+  return url
+    ? url.substring(1)
+    : ''
+}
+const createHeaders = () => {
+  let { AppKey, AppSecret, Nonce } = imConfig,
+    CurTime = (Date.now() / 1000).toFixed(0),
+    CheckSum = SHA1.hex(AppSecret + Nonce + CurTime);
+  return {
+    AppKey,
+    Nonce,
+    CurTime,
+    CheckSum
+  }
+}
+
+const user = {
+   test: 'e1a798af33cac26c284e4f2344be251e',
+   test1:'3e562f60c6ebc35df8fcc352737fc73f',
+  "chatroom": {
+    "roomid": 17985963,
+    "valid": true,
+    "announcement": null,
+    "muted": false,
+    "name": "测试聊天室",
+    "broadcasturl": null,
+    "ext": "",
+    "creator": "test",
+    addr: [
+      "weblink04.netease.im:443"
+    ],
+  },
+}
+Api.post('/createImUser', async (ctx) => {
+  let { username } = ctx.request.body;
+
+  await axios.post('https://api.netease.im/nimserver/user/create.action', paramStringify({ accid: username }), {
+    headers: {
+      ...createHeaders()
+    }
+  })
+    .then(res => {
+      ctx.body = res.data
+    })
+
+});
+Api.post('/refreshImUserToken', async (ctx) => {
+  let { username } = ctx.request.body;
+  await axios.post('https://api.netease.im/nimserver/user/refreshToken.action', paramStringify({ accid: username }), {
+    headers: {
+      ...createHeaders()
+    }
+  })
+    .then(res => {
+      ctx.body = res.data
+    })
+
+});
+Api.post('/createChatroom', async (ctx) => {
+  let { username } = ctx.request.body;
+  await axios.post('https://api.netease.im/nimserver/chatroom/create.action',
+    paramStringify({
+      creator: 'test',
+      name: '测试聊天室'
+    }), {
+      headers: {
+        ...createHeaders()
+      }
+    })
+    .then(res => {
+      ctx.body = res.data
+    })
+
+});
+Api.post('/requestChatroomAddr', async (ctx) => {
+  await axios.post('https://api.netease.im/nimserver/chatroom/requestAddr.action ',
+    paramStringify({
+      accid: 'test',
+      roomid: '17985963'
+    }), {
+      headers: {
+        ...createHeaders()
+      }
+    })
+    .then(res => {
+      ctx.body = res.data
+    })
+
+});
 // 使用ctx.body解析中间件
 app.use(bodyParser());
 //允许跨域
@@ -270,10 +375,10 @@ app.use(cors({
 }));
 //挂载路由
 router.use('/api/v1', function (ctx, next) {
-  console.log(ctx.cookies.get('login_sign',12))
+  console.log(ctx.cookies.get('login_sign', 12))
   return next();
 })
-.use('/api/v1', Api.routes(), Api.allowedMethods());
+  .use('/api/v1', Api.routes(), Api.allowedMethods());
 app
   .use(router.routes())
   .use(router.allowedMethods());

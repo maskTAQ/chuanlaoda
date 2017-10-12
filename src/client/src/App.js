@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 
+import ChatRoom from 'page/chatRoom/chatRoom.js';
 import Login from 'page/login/login.js';
 import Home from 'page/home/home.js';
 import Market from 'page/market/market.js';
@@ -21,6 +22,7 @@ import reducer from 'reducer';
 
 const store = createStore(reducer, initState);
 class App extends Component {
+  
   render() {
     return (
       <Provider store={store}>
@@ -32,6 +34,7 @@ class App extends Component {
               <Route path="/me" component={Me} />
               <Route exact path="/Login" component={Login} />
               <Route path="/register" component={Register} />
+              <Route path="/chat-room" component={ChatRoom} />
             </div>
             <BottomNav />
           </div>
