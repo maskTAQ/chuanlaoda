@@ -1,5 +1,21 @@
 $background:#3e4d68;
 .container {
     flex: 1;
+    display: flex;
+    flex-direction: column;
     background: $background;
+}
+
+.slide-container {
+    height: 1.8rem;
+    div{
+        height: 100%;
+    }
+    :global(.slick-arrow) {
+        display: none!important;
+    }
+    :global(.slick-slide) {
+        float: left;
+        height: 100%;
+    }
 }

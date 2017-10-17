@@ -73,6 +73,7 @@ class BottomNav extends Component {
     render() {
         const {visible} = this.state;
         const {isBottomNavVisible} = this.props;
+        const currentPath = window.location.pathname;
         const bottom = isBottomNavVisible
             ? 0
             : -56;
@@ -82,7 +83,7 @@ class BottomNav extends Component {
         }
         
         return (
-            <Paper zDepth={1} className={styles['bottom-nav']} style={{bottom:`${bottom}px`}}>
+            <Paper zDepth={1} className={styles['bottom-nav']} style={{bottom:`${bottom}px`,position:currentPath === '/market'?'absolute':'relative'}}>
             <BottomNavigation selectedIndex={this.state.selectedIndex}>
                 <BottomNavigationItem
                     label="首页"

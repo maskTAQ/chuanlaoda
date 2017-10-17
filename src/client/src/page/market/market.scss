@@ -3,6 +3,7 @@ $button-background:#57657e;
 $button-color:#d2d6dd;
 .container {
     flex: 1;
+    display: flex;
     position: relative;
     background: $background;
     .add-order {

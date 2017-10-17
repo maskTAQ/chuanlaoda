@@ -37,7 +37,8 @@ export default class List extends Component {
         const { data } = this.props;
         return (
             <div ref="listContainer" style={{
-                height: '100%'
+                flex: '1',
+                overflow:'hidden'
             }}>
                 <ul className={styles.list}>
                     {data.map((item, i) => {

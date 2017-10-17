@@ -303,9 +303,7 @@ Api.post('/createImUser', async (ctx) => {
   let { username } = ctx.request.body;
 
   await axios.post('https://api.netease.im/nimserver/user/create.action', paramStringify({ accid: username }), {
-    headers: {
-      ...createHeaders()
-    }
+    headers:createHeaders()
   })
     .then(res => {
       ctx.body = res.data
@@ -315,9 +313,7 @@ Api.post('/createImUser', async (ctx) => {
 Api.post('/refreshImUserToken', async (ctx) => {
   let { username } = ctx.request.body;
   await axios.post('https://api.netease.im/nimserver/user/refreshToken.action', paramStringify({ accid: username }), {
-    headers: {
-      ...createHeaders()
-    }
+    headers:createHeaders()
   })
     .then(res => {
       ctx.body = res.data
@@ -331,9 +327,7 @@ Api.post('/createChatroom', async (ctx) => {
       creator: 'test',
       name: '测试聊天室'
     }), {
-      headers: {
-        ...createHeaders()
-      }
+      headers:createHeaders()
     })
     .then(res => {
       ctx.body = res.data
@@ -346,9 +340,7 @@ Api.post('/requestChatroomAddr', async (ctx) => {
       accid: 'test',
       roomid: '17985963'
     }), {
-      headers: {
-        ...createHeaders()
-      }
+      headers: createHeaders()
     })
     .then(res => {
       ctx.body = res.data
