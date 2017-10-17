@@ -8,6 +8,8 @@ $background:#3e4d68;
 
 .slide-container {
     height: 1.8rem;
+    border-bottom: 1px solid #353131;
+    box-shadow: -6px 2px 8px #2b1a1a;
     div{
         height: 100%;
     }
@@ -17,5 +19,8 @@ $background:#3e4d68;
     :global(.slick-slide) {
         float: left;
         height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }

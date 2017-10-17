@@ -63,7 +63,8 @@ class Home extends Component {
                 return (
                     <div className={styles.container} ref="containerList">
                         <Slider className={styles['slide-container']}>
-                            <div className={styles['slide-item']}><p>12</p></div>
+                            <div>应用开发中...</div>
+                            <div>敬请期待</div>
                         </Slider>
                         <List data={data}/>
                     </div>
