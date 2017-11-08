@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import { createStore } from 'redux';
-import { Provider } from 'react-redux';
+import React, {Component} from 'react';
+import {BrowserRouter as Router, Route, Redirect,Switch} from 'react-router-dom'
+import {createStore} from 'redux';
+import {Provider} from 'react-redux';
 
 import ChatRoom from 'page/chatRoom/chatRoom.js';
 import Login from 'page/login/login.js';
@@ -22,21 +22,30 @@ import reducer from 'reducer';
 
 const store = createStore(reducer, initState);
 class App extends Component {
-  
+
   render() {
     return (
       <Provider store={store}>
         <Router>
           <div className={styles.container}>
             <div className={styles['container-item']}>
-              <Route exact path="/home" component={Home} />
-              <Route path="/market" component={Market} />
-              <Route path="/me" component={Me} />
-              <Route exact path="/Login" component={Login} />
-              <Route path="/register" component={Register} />
-              <Route path="/chat-room" component={ChatRoom} />
+              <Switch>
+                <Route path="/home" component={Home}/>
+                <Route path="/market" component={Market}/>
+                <Route path="/me" component={Me}/>
+                <Route path="/Login" component={Login}/>
+                <Route path="/register" component={Register}/>
+                <Route path="/chat-room" component={ChatRoom}/>
+                <Route
+                  path="/"
+                  render={({location}) => {
+                    console.log(location)
+                  return (<Redirect to="/home"/>)
+                }}></Route>
+              </Switch>
             </div>
-            <BottomNav />
+            <Route component={BottomNav}></Route>
+            
           </div>
         </Router>
       </Provider>

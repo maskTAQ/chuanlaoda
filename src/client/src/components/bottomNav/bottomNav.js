@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FontIcon, Paper } from 'material-ui';
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
@@ -7,84 +6,25 @@ import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNaviga
 import styles from './bottomNav.scss';
 
 class BottomNav extends Component {
-    static contextTypes = {
-        router: PropTypes.shape({
-            history: PropTypes.shape({
-                push: PropTypes.func.isRequired,
-                replace: PropTypes.func.isRequired,
-                createHref: PropTypes.func.isRequired
-            }).isRequired
-        }).isRequired
-    }
-    state = {
-        selectedIndex: 0,
-        //组件是否显示
-        visible: true,
-        //上一个按钮可见的状态
-        prevIsBottomNavVisible:''
-    };
-    componentWillUpdate(nextProps,nextState) {
-        if(this.props.isBottomNavVisible !== nextProps.isBottomNavVisible){
-            //每次导航条状态改变时 合并到state中
-            nextState.prevIsBottomNavVisible=this.props.isBottomNavVisible
-        }
-        
-        this.judgeVisible();
-    }
-    componentWillMount() {
-        this.setState({
-            prevIsBottomNavVisible:this.props.isBottomNavVisible
-        });
-        this.judgeVisible();
-    }
     link(path, index) {
-        this.setState({ selectedIndex: index });
-        this.context.router.history.push({ pathname: `/${path}` })
-    }
-    judgeVisible() {
-        const pathMap = ['/home', '/market', '/me'],
-            //这里的路径再按返回键的时候不准确
-            // currentPath = this.context.router.route.location.pathname,
-            currentPath = window.location.pathname,
-            currentIndex = pathMap.indexOf(currentPath);
-        const { selectedIndex,visible } = this.state;
-
-        //如果不是map中定义的路径则隐藏nav
-        if(visible){
-            if (currentIndex === -1) {
-                this.setState({
-                    visible: false
-                });
-            } 
-        }else{
-            if (currentIndex > -1) {
-                this.setState({
-                    visible:true
-                });
-            } 
-        }
-        
-        //同步nav的激活状态
-        if (selectedIndex !== currentIndex) {
-            this.setState({ selectedIndex: pathMap.indexOf(currentPath) });
-        }
-
+        this.props.history.push({ pathname: `/${path}` })
     }
     render() {
-        const {visible} = this.state;
-        const {isBottomNavVisible} = this.props;
-        const currentPath = window.location.pathname;
+        const {isBottomNavVisible,location:{pathname:currentPath}} = this.props;
         const bottom = isBottomNavVisible
             ? 0
             : -56;
-        
-        if (!visible) {
+        const isPlaceholder =currentPath === '/market';
+        const pathMap = ['/home', '/market', '/me'];
+
+        if (pathMap.indexOf(currentPath) === -1) {
             return null
         }
         
+        //在market页面时 此组件脱离文档流 这样列表就能渲染整个高度了
         return (
-            <Paper zDepth={1} className={styles['bottom-nav']} style={{bottom:`${bottom}px`,position:currentPath === '/market'?'absolute':'relative'}}>
-            <BottomNavigation selectedIndex={this.state.selectedIndex}>
+            <Paper zDepth={1} className={styles['bottom-nav']} style={{bottom:`${bottom}px`,position:isPlaceholder ?'absolute':'relative'}}>
+            <BottomNavigation selectedIndex={pathMap.indexOf(currentPath)}>
                 <BottomNavigationItem
                     label="首页"
                     icon={<FontIcon className="material-icons">&#xE88A;</FontIcon>}
@@ -109,4 +49,4 @@ function mapStateToProps(state) {
     const {  isBottomNavVisible } = state;
     return { isBottomNavVisible }
 }
-export default connect(mapStateToProps)(BottomNav)
+export default connect(mapStateToProps,null)(BottomNav)
