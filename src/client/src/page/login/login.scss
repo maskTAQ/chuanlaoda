@@ -14,9 +14,16 @@
     color: #ed2553;
     font-weight: bold;
 }
-.content{
+
+.content,
+.register {
     padding-left: 0.2rem;
 }
-.button{
+
+.register {
+    margin-top: 0.15rem;
+}
+
+.button {
     margin: 0.15rem;
 }

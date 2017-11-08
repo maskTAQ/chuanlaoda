@@ -18,6 +18,7 @@ mongoose.Promise = global.Promise;
 const Schema = mongoose.Schema;
 //初始化用户模板 包含三个field
 const userSchema = new Schema({
+  userType: Number, //['船主','货主']
   username: String,
   password: String,
   email: String,
@@ -59,20 +60,18 @@ const freightOrderSchema = new Schema({
 //为模板绑定方法 检查用户是否可以注册
 userSchema.methods.canRegister = function () {
   return new Promise((resolve, reject) => {
-    const filtCondition = [{
-      'username': this.username
-    }];
+    const filtCondition = [
+      {
+        'username': this.username
+      }
+    ];
     if (this.email) {
-      filtCondition.push({
-        'email': this.email
-      });
+      filtCondition.push({'email': this.email});
     }
 
     this
       .model('User')
-      .find({
-        $or: filtCondition
-      })
+      .find({$or: filtCondition})
       .exec((e, users) => {
         if (e) {
           return reject(e);
@@ -95,9 +94,20 @@ const app = new Koa();
 const Api = new Router();
 const router = new Router();
 
-Api.post('/register', async (ctx) => {
-  const { username, password, phone } = ctx.request.body;
+const setCookie = (ctx, phone, password) => {
+  ctx
+    .cookies
+    .set('login_sign',
+    //Hexadecimal hash with HMAC salt key(_id).
+    new Hashes.SHA1().hex_hmac('taiaiqiang', `phone=${phone}&password=${password}`), {
+      maxAge: 10 * 60 * 1000, // cookie有效时长
+      httpOnly: false, // 是否只用于http请求中获取
+      overwrite: false // 是否允许重写
+    });
+}
 
+Api.post('/register', async(ctx) => {
+  const {username, password, phone, userType} = ctx.request.body;
   if (!username || !password || !phone) {
     ctx.body = {
       Status: 0,
@@ -110,10 +120,11 @@ Api.post('/register', async (ctx) => {
   //实例化用户
   const u = new User(ctx.request.body);
   await u
-    //检测用户是否能注册
+  //检测用户是否能注册
     .canRegister()
     .then(u.save())
     .then(() => {
+      setCookie(ctx,phone,password);
       ctx.body = {
         Status: 1,
         Message: '注册成功'
@@ -128,8 +139,8 @@ Api.post('/register', async (ctx) => {
     })
 });
 
-Api.post('/login', async (ctx) => {
-  const { phone, password, email } = ctx.request.body;
+Api.post('/login', async(ctx) => {
+  const {phone, password, email} = ctx.request.body;
   const searchCondition = {};
   if (phone && password) {
     searchCondition.phone = phone;
@@ -160,21 +171,12 @@ Api.post('/login', async (ctx) => {
         };
       }
 
-      ctx.cookies.set(
-        'login_sign',
-        //Hexadecimal hash with HMAC salt key(_id).
-        new Hashes.SHA1().hex_hmac(res._id, `phone=${res.phone}&password=${res.password}`),
-        {
-          maxAge: 10 * 60 * 1000, // cookie有效时长
-          httpOnly: false,  // 是否只用于http请求中获取
-          overwrite: false  // 是否允许重写
-        }
-      );
-
       return ctx.body = {
         Status: 1,
         Message: '登录成功',
-        data: ctx.cookies.get('login_sign') || 12
+        data: ctx
+          .cookies
+          .get('login_sign') || 12
       };
 
     })
@@ -188,7 +190,7 @@ Api.post('/login', async (ctx) => {
 
 });
 
-Api.post('/pubulishCargo', async (ctx) => {
+Api.post('/pubulishCargo', async(ctx) => {
   const {
     username,
     origin,
@@ -231,7 +233,7 @@ Api.post('/pubulishCargo', async (ctx) => {
     })
 });
 
-Api.get('/getOrders', async (ctx) => {
+Api.get('/getOrders', async(ctx) => {
   await FreightOrder
     .find()
     .then(orders => {
@@ -271,20 +273,15 @@ const paramStringify = (data) => {
     : ''
 }
 const createHeaders = () => {
-  let { AppKey, AppSecret, Nonce } = imConfig,
+  let {AppKey, AppSecret, Nonce} = imConfig,
     CurTime = (Date.now() / 1000).toFixed(0),
     CheckSum = SHA1.hex(AppSecret + Nonce + CurTime);
-  return {
-    AppKey,
-    Nonce,
-    CurTime,
-    CheckSum
-  }
+  return {AppKey, Nonce, CurTime, CheckSum}
 }
 
 const user = {
-   test: 'e1a798af33cac26c284e4f2344be251e',
-   test1:'3e562f60c6ebc35df8fcc352737fc73f',
+  test: 'e1a798af33cac26c284e4f2344be251e',
+  test1: '3e562f60c6ebc35df8fcc352737fc73f',
   "chatroom": {
     "roomid": 17985963,
     "valid": true,
@@ -294,57 +291,35 @@ const user = {
     "broadcasturl": null,
     "ext": "",
     "creator": "test",
-    addr: [
-      "weblink04.netease.im:443"
-    ],
-  },
+    addr: ["weblink04.netease.im:443"]
+  }
 }
-Api.post('/createImUser', async (ctx) => {
-  let { username } = ctx.request.body;
+Api.post('/createImUser', async(ctx) => {
+  let {username} = ctx.request.body;
 
-  await axios.post('https://api.netease.im/nimserver/user/create.action', paramStringify({ accid: username }), {
-    headers:createHeaders()
+  await axios.post('https://api.netease.im/nimserver/user/create.action', paramStringify({accid: username}), {headers: createHeaders()}).then(res => {
+    ctx.body = res.data
   })
-    .then(res => {
-      ctx.body = res.data
-    })
 
 });
-Api.post('/refreshImUserToken', async (ctx) => {
-  let { username } = ctx.request.body;
-  await axios.post('https://api.netease.im/nimserver/user/refreshToken.action', paramStringify({ accid: username }), {
-    headers:createHeaders()
+Api.post('/refreshImUserToken', async(ctx) => {
+  let {username} = ctx.request.body;
+  await axios.post('https://api.netease.im/nimserver/user/refreshToken.action', paramStringify({accid: username}), {headers: createHeaders()}).then(res => {
+    ctx.body = res.data
   })
-    .then(res => {
-      ctx.body = res.data
-    })
 
 });
-Api.post('/createChatroom', async (ctx) => {
-  let { username } = ctx.request.body;
-  await axios.post('https://api.netease.im/nimserver/chatroom/create.action',
-    paramStringify({
-      creator: 'test',
-      name: '测试聊天室'
-    }), {
-      headers:createHeaders()
-    })
-    .then(res => {
-      ctx.body = res.data
-    })
+Api.post('/createChatroom', async(ctx) => {
+  let {username} = ctx.request.body;
+  await axios.post('https://api.netease.im/nimserver/chatroom/create.action', paramStringify({creator: 'test', name: '测试聊天室'}), {headers: createHeaders()}).then(res => {
+    ctx.body = res.data
+  })
 
 });
-Api.post('/requestChatroomAddr', async (ctx) => {
-  await axios.post('https://api.netease.im/nimserver/chatroom/requestAddr.action ',
-    paramStringify({
-      accid: 'test',
-      roomid: '17985963'
-    }), {
-      headers: createHeaders()
-    })
-    .then(res => {
-      ctx.body = res.data
-    })
+Api.post('/requestChatroomAddr', async(ctx) => {
+  await axios.post('https://api.netease.im/nimserver/chatroom/requestAddr.action ', paramStringify({accid: 'test', roomid: '17985963'}), {headers: createHeaders()}).then(res => {
+    ctx.body = res.data
+  })
 
 });
 // 使用ctx.body解析中间件
@@ -352,8 +327,7 @@ app.use(bodyParser());
 //允许跨域
 app.use(cors({
   origin: function (ctx) {
-    return '*';
-    return 'http://localhost:3000,http://192.168.1.155:3000,http://192.168.0.101:3000,www.deepskyblue.cn:3000'; // 这样就能只允许 http://localhost:3000 这个域名的请求了
+    return 'http://localhost:3000'; // 这样就能只允许 http://localhost:3000 这个域名的请求了
   },
   exposeHeaders: [
     'WWW-Authenticate', 'Server-Authorization'
@@ -369,8 +343,7 @@ app.use(cors({
 router.use('/api/v1', function (ctx, next) {
   console.log(ctx.cookies.get('login_sign', 12))
   return next();
-})
-  .use('/api/v1', Api.routes(), Api.allowedMethods());
+}).use('/api/v1', Api.routes(), Api.allowedMethods());
 app
   .use(router.routes())
   .use(router.allowedMethods());

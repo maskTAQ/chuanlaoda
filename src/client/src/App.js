@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Redirect,Switch} from 'react-router-dom'
+import {BrowserRouter as Router, Route, Redirect,Switch} from 'react-router-dom';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
 
