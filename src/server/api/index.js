@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const Api = new Router();
 const router = new Router();
 const {userSchema, freightOrderSchema} = require('../schema');
-const {setCookie} = require('../utils/setCookie.js');
+const {setCookie,getCookie} = require('../utils/cookie.js');
 
 //连接数据库
 const db = mongoose.createConnection('mongodb://localhost/chuanlaoda');
@@ -106,7 +106,49 @@ Api.post('/login', async(ctx) => {
         })
 
 });
+Api.get('/getloginstatus', async(ctx) => {
+    const phone = getCookie(ctx,'user_phone');
+    const sign = getCookie(ctx,'login_sign');
+    if(!phone){
+        ctx.body = {
+            Status: 0,
+            Message: '未登录'
+        };
+    }
+    await User
+        .findOne({phone})
+        .then((res) => {
+            const {password} = res || {};
+            if (!res) {
+                return ctx.body = {
+                    Status: 0,
+                    Message: '未登录，用户无效'
+                };
+            }
+            
+            const new_sign = new Hashes.SHA1().hex_hmac('taiaiqiang', `phone=${phone}&password=${password}`);
+            if(sign === new_sign ){
+                return ctx.body = {
+                    Status: 1,
+                    Message: '已登录',
+                    Data: res
+                };
+            }else{
+                return ctx.body = {
+                    Status: 0,
+                    Message: '未登录'
+                };
+            }
+        })
+        .catch(e => {
+            ctx.body = {
+                Status: 0,
+                Message: '未登录',
+                Data: e
+            };
+        })
 
+});
 Api.post('/pubulishCargo', async(ctx) => {
     const {
         username,

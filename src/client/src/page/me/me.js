@@ -6,6 +6,8 @@ import 'moment/locale/zh-cn';
 
 import Loading from 'components/loading/loading.js';
 import styles from './me.scss';
+
+import avatorSrc from './avator.png';
 moment.locale('zh-cn');
 class Me extends Component {
     static defaultProps = {
@@ -34,11 +36,11 @@ class Me extends Component {
         }
     }
     render() {
-
+        const {username} = this.props.userInfo;
         return (
             <div className={styles['me-container']}>
                 <div className={styles.header}>
-                    <h2 className={styles.welcome}>你好,老宋!</h2>
+                    <h2 className={styles.welcome}>你好,{username}!</h2>
                     <div className={styles.avatar}></div>
                 </div>
                 {this.renderList()
