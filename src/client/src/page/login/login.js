@@ -11,10 +11,10 @@ import Validator from 'utils/formVerify.js';
 
 class Login extends Component {
     state = {
-        phoneOrEmail: '13696526122',
+        phoneOrEmail: '',
         phoneOrEmailErrorText: '',
-        password: '123456',
-        phone: '13696526122',
+        password: '',
+        phone: '',
         email: '',
         passwordErrorText: ''
     };

@@ -53,12 +53,12 @@ class Tab extends Component {
 class Register extends Component {
     state = {
         tabIndex: 0,
-        username: '邰爱强',
+        username: '',
         usernameErrorText: '',
-        password: '123456',
+        password: '',
         passwordErrorText: '',
-        email: '50889574@qq.com',
-        phone: '13696526122',
+        email: '',
+        phone: '',
         phoneErrorText: '',
         wxId: '',
         //船号
