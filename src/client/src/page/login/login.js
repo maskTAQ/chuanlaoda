@@ -9,10 +9,10 @@ import styles from './login.scss';
 
 export default class Login extends Component {
     state = {
-        phoneOrEmail: '',
+        phoneOrEmail: '13696526122',
         phoneOrEmailErrorText: '',
-        password: '',
-        phone: '',
+        password: '123456',
+        phone: '13696526122',
         email: '',
         passwordErrorText: ''
     };
@@ -24,9 +24,14 @@ export default class Login extends Component {
                 withCredentials: 'credentials'
             }).then(({data}) => {
                 const {Status, Message} = data;
-                console.log(data);
                 if (Status) {
-                    //this.props.history.push('/home');
+                    this
+                        .props
+                        .history
+                        .push('/home', {
+                            from: '/login',
+                            to: '/home'
+                        });
                 } else {
                     alert(Message)
                 }

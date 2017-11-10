@@ -56,6 +56,7 @@ class Home extends Component {
             .getOrders();
     }
     render() {
+        console.log(this,'home')
         const {status, data} = this.state;
         const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose}/>), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders}/>)];
         switch (status) {
