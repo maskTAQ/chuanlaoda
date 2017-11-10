@@ -1,24 +1,38 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 //import { FlatButton, FontIcon } from 'material-ui';
+import {connect} from 'react-redux';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 
 import Loading from 'components/loading/loading.js';
 import styles from './me.scss';
 moment.locale('zh-cn');
-export default class Me extends Component {
+class Me extends Component {
     static defaultProps = {
-        unreadMessages: [{
-            username: '游客',
-            time: moment("20171005", "YYYYMMDD").fromNow(),
-            message: '查看了你发布的消息!'
-        },
-        {
-            username: '李先生',
-            time: moment("20170905", "YYYYMMDD").fromNow(),
-            message: '关注了你发布的消息!'
-        }]
+        unreadMessages: [
+            {
+                username: '游客',
+                time: moment("20171005", "YYYYMMDD").fromNow(),
+                message: '查看了你发布的消息!'
+            }, {
+                username: '李先生',
+                time: moment("20170905", "YYYYMMDD").fromNow(),
+                message: '关注了你发布的消息!'
+            }
+        ]
     };
+    componentWillMount() {
+        const {userInfo} = this.props;
+        if (!userInfo.username) {
+            this
+                .props
+                .history
+                .push('/login', {
+                    form: 'me',
+                    to: 'login'
+                });
+        }
+    }
     render() {
 
         return (
@@ -27,21 +41,20 @@ export default class Me extends Component {
                     <h2 className={styles.welcome}>你好,老宋!</h2>
                     <div className={styles.avatar}></div>
                 </div>
-                {
-                    this.renderList()
-                }
+                {this.renderList()
+}
             </div>
         )
     }
     renderList() {
-        const { unreadMessages } = this.props;
+        const {unreadMessages} = this.props;
         const l = unreadMessages.length;
         if (l) {
             return (
                 <div className={styles.list}>
                     <p className={styles.title}>{l}条与您有关的消息!</p>
                     {unreadMessages.map(item => {
-                        const { username, time, message } = item;
+                        const {username, time, message} = item;
                         return (
                             <div className={styles.item} key={time + username}>
                                 <div className={styles.border}></div>
@@ -64,3 +77,10 @@ export default class Me extends Component {
         }
     }
 }
+
+function mapStateToProps(state) {
+    const {userInfo} = state;
+    return {userInfo};
+}
+
+export default connect(mapStateToProps, null)(Me)

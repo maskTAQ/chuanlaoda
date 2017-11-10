@@ -1,4 +1,13 @@
+const Hashes = require('jshashes');
+var SHA1 = new Hashes.SHA1;
 const setCookie = (ctx, phone, password) => {
+    ctx
+    .cookies
+    .set('user_phone', phone, {
+        maxAge: 10 * 60 * 1000, // cookie有效时长
+        httpOnly: false, // 是否只用于http请求中获取
+        overwrite: false // 是否允许重写
+    });
     ctx
         .cookies
         .set('login_sign',
@@ -8,11 +17,9 @@ const setCookie = (ctx, phone, password) => {
             httpOnly: false, // 是否只用于http请求中获取
             overwrite: false // 是否允许重写
         });
-    ctx
-        .cookies
-        .set('userPhone', phone);
+    
 }
 
-module.export = {
+module.exports = {
     setCookie
 }

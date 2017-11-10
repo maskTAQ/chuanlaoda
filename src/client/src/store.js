@@ -3,9 +3,6 @@ export default {
         status:'init',
         data:null
     },
-    user:{
-        status:'init',
-        data:null
-    },
+    userInfo:{},
     isBottomNavVisible:true
 }

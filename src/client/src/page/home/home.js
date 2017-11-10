@@ -92,8 +92,8 @@ class Home extends Component {
 
 // Map Redux state to component props
 function mapStateToProps(state) {
-    const {orders} = state;
-    return {orders}
+    const {orders,userInfo} = state;
+    return {orders,userInfo}
 }
 
 // Map Redux actions to component props

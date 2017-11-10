@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 import {TextField, RaisedButton} from 'material-ui';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
+import {connect} from 'react-redux';
 
 import paramStringify from 'utils/paramStringify.js';
 import {Api} from 'src/config.js';
 import styles from './login.scss';
+import Validator from 'utils/formVerify.js';
 
-export default class Login extends Component {
+class Login extends Component {
     state = {
         phoneOrEmail: '13696526122',
         phoneOrEmailErrorText: '',
@@ -23,8 +25,11 @@ export default class Login extends Component {
                 //当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
                 withCredentials: 'credentials'
             }).then(({data}) => {
-                const {Status, Message} = data;
+                const {Status, Message, Data} = data;
                 if (Status) {
+                    this
+                        .props
+                        .set_userInfo(Data);
                     this
                         .props
                         .history
@@ -36,34 +41,56 @@ export default class Login extends Component {
                     alert(Message)
                 }
             }).catch(e => {
-                console.log(e)
                 alert('登录失败')
             });
         }
     }
     verifyValue(values) {
-        const {password, phoneOrEmail} = Object.assign(this.state, values),
-            phoneReg = /^1[3|4|5|7|8][0-9]{9}$/, //验证手机
-            emailReg = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/; //验证邮箱
+        const {password, phoneOrEmail} = Object.assign(this.state, values);
+        let result = true;
 
-        if (phoneReg.test(phoneOrEmail)) {
-            this.setState({phoneOrEmailErrorText: '', phone: phoneOrEmail});
-        } else if (emailReg.test(phoneOrEmail)) {
-            this.setState({phoneOrEmailErrorText: '', email: phoneOrEmail});
-        } else {
-            this.setState({phoneOrEmailErrorText: '手机号或邮箱输入错误'});
-            return false;
-
-        }
-        if (password.length >= 6) {
+        const validator = new Validator();
+        validator.add(phoneOrEmail, [
+            {
+                strategy: 'isPhone',
+                errorMsg: '请输入手机号'
+            }, {
+                strategy: 'isEmail',
+                errorMsg: '请输入邮箱'
+            }
+        ], (e) => {
+            if (e.length === 2) {
+                result = false;
+                this.setState({phoneOrEmailErrorText: e[0]});
+            } else {
+                if (e[0] === '请输入手机号') {
+                    this.setState({email: phoneOrEmail, phoneOrEmailErrorText: ''});
+                } else {
+                    this.setState({phone: phoneOrEmail, phoneOrEmailErrorText: ''});
+                }
+            }
+        });
+        validator.add(password, [
+            {
+                strategy: 'isNoEmpty',
+                errorMsg: '密码不可为空'
+            }, {
+                strategy: 'minLength:6',
+                errorMsg: '密码不能小于6位'
+            }
+        ], (e) => {
+            result = false;
+            this.setState({
+                passwordErrorText: e.join()
+            });
+        });
+        if (result) {
             this.setState({passwordErrorText: ''});
-        } else {
-
-            this.setState({passwordErrorText: '密码必须大于六位'});
-            return false;
         }
 
-        return true;
+        validator.start();
+
+        return result;
     }
     onValueChange(type, value) {
         this.setState({[type]: value});
@@ -105,3 +132,17 @@ export default class Login extends Component {
     }
 
 }
+
+function mapStateToProps(state) {
+    const {userInfo} = state;
+
+    return {userInfo}
+}
+function mapDispatchToProps(dispatch) {
+    return {
+        set_userInfo(userInfo) {
+            dispatch({type: 'set_userInfo', data: userInfo});
+        }
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

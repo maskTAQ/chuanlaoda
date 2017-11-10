@@ -3,10 +3,12 @@ import classNames from 'classNames';
 import {TextField, RaisedButton} from 'material-ui';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
+import {connect} from 'react-redux';
 
 import paramStringify from 'utils/paramStringify.js';
 import {Api} from 'src/config.js';
 import styles from './register.scss';
+import Validator from 'utils/formVerify.js';
 
 class Tab extends Component {
     static defaultProps = {
@@ -48,50 +50,70 @@ class Tab extends Component {
     }
 }
 
-export default class Register extends Component {
+class Register extends Component {
     state = {
         tabIndex: 0,
         username: '邰爱强',
         usernameErrorText: '',
         password: '123456',
+        passwordErrorText: '',
         email: '50889574@qq.com',
         phone: '13696526122',
+        phoneErrorText: '',
         wxId: '',
         //船号
         shipNumber: '',
+        shipNumberErrorText: '',
         //船载重
-        shipTonnage: ''
+        shipTonnage: '',
+        shipTonnageErrorText: ''
     };
-    constructor(){
-        super();
-
-        //提交给后端的数据
-        this.postUserData = {};
-    }
     onTabChange = (tabIndex) => {
         this.setState({tabIndex});
     }
     register = () => {
         const verifyResult = this.verifyValue();
+        const {
+            username,
+            password,
+            email,
+            phone,
+            shipNumber,
+            shipTonnage,
+            tabIndex
+        } = this.state;
+
         if (verifyResult) {
-            axios
-                .post(`${Api}/register`, paramStringify(this.postUserData))
-                .then(({data}) => {
-                    const {Status, Message} = data;
-                    console.log(data);
-                    return
-                    if (Status) {
-                        this
-                            .props
-                            .history
-                            .push('/home');
-                    } else {
-                        alert(Message)
-                    }
-                })
-                .catch(e => {
-                    alert('注册失败')
-                });
+            axios.post(`${Api}/register`, paramStringify({
+                username,
+                password,
+                email,
+                phone,
+                shipNumber,
+                shipTonnage,
+                userType: tabIndex
+            }), {
+                //当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
+                withCredentials: 'credentials'
+            }).then(({data}) => {
+                const {Status, Message,Data} = data;
+                if (Status) {
+                    this
+                    .props
+                    .set_userInfo(Data);
+                    this
+                        .props
+                        .history
+                        .push('/home', {
+                            form: 'register',
+                            to: 'home'
+                        });
+                } else {
+                    alert(Message)
+                }
+            }).catch(e => {
+                alert('注册失败')
+            });
         }
     }
     verifyValue(values) {
@@ -101,49 +123,70 @@ export default class Register extends Component {
             email,
             phone,
             shipNumber,
-            shipTonnage
-        } = this.state;
-        const {tabIndex} = this.state;
-        values = Object.assign({
-            username,
-            password,
-            email,
-            phone,
-            shipNumber,
-            shipTonnage
-        }, values);
-        let stayVerifyValues = values;
+            shipTonnage,
+            tabIndex
+        } = Object.assign(this.state, values);
 
-        if(tabIndex === 1 ){
-            stayVerifyValues = {
-                username,
-                password,
-                email,
-                phone,
+        const validator = new Validator();
+        this.setState({usernameErrorText: '', passwordErrorText: '', phoneErrorText: '', shipNumberErrorText: '', shipTonnageErrorText: ''})
+
+        validator.add(username, [
+            {
+                strategy: 'minLength:2',
+                errorMsg: '用户名不能少于二位数'
             }
-        }
+        ], (e) => {
+            this.setState({usernameErrorText: e[0]});
+        });
+        validator.add(password, [
+            {
+                strategy: 'minLength:6',
+                errorMsg: '密码不能少于六位数'
+            }
+        ], (e) => {
+            this.setState({passwordErrorText: e[0]});
+        });
 
-        let result = true;
-        for (let item in stayVerifyValues) {
-            if (stayVerifyValues[item]) {
-                this.setState({
-                    [`${item}ErrorText`]: ''
-                });
-
-            } else {
-                //邮箱可不填
-                if (item === 'email') {
-                    continue;
+        validator.add(phone, [
+            {
+                strategy: 'isPhone',
+                errorMsg: '请输入正确的手机号'
+            }
+        ], (e) => {
+            this.setState({phoneErrorText: e[0]});
+        });
+        if (tabIndex === 0) {
+            validator.add(shipNumber, [
+                {
+                    strategy: 'isNoEmpty',
+                    errorMsg: '请输入船号'
                 }
-                this.setState({
-                    [`${item}ErrorText`]: '请填写此项'
-                });
-                result = false;
-            }
+            ], (e) => {
+                this.setState({shipNumberErrorText: e[0]});
+            });
+            validator.add(shipTonnage, [
+                {
+                    strategy: 'isNoEmpty',
+                    errorMsg: '请输入船载重吨数'
+                }
+            ], (e) => {
+                this.setState({shipTonnageErrorText: e[0]});
+            });
         }
-        stayVerifyValues.userType = tabIndex;
-        this.postUserData = stayVerifyValues;
-        return result;
+        //邮箱不是强制需要的
+        if (email) {
+            validator.add(email, [
+                {
+                    strategy: 'isEmail',
+                    errorMsg: '请输入正确的邮箱'
+                }
+            ], (e) => {
+                this.setState({emailErrorText: e[0]});
+            });
+        }
+
+        let result = validator.start();
+        return result.length === 0;
     }
     render() {
         const {tabIndex} = this.state;
@@ -238,6 +281,7 @@ export default class Register extends Component {
                         <TextField
                             floatingLabelText="用户名"
                             hintText="请输入您的真实姓名"
+                            errorText={usernameErrorText}
                             value={username}
                             onChange={(proxy, v) => {
                             this.onValueChange('username', v)
@@ -247,6 +291,7 @@ export default class Register extends Component {
                             hintText="请输入密码"
                             type="password"
                             value={password}
+                            errorText={passwordErrorText}
                             onChange={(proxy, v) => {
                             this.onValueChange('password', v)
                         }}/>
@@ -261,6 +306,7 @@ export default class Register extends Component {
                             floatingLabelText="手机"
                             hintText="请输入您的手机号"
                             value={phone}
+                            errorText={phoneErrorText}
                             onChange={(proxy, v) => {
                             this.onValueChange('phone', v)
                         }}/>
@@ -269,3 +315,13 @@ export default class Register extends Component {
         }
     }
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        set_userInfo(userInfo) {
+            dispatch({type: 'set_userInfo', data: userInfo});
+        }
+    }
+}
+
+export default connect(null,mapDispatchToProps)(Register)

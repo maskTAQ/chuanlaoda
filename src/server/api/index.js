@@ -23,7 +23,7 @@ const User = db.model('User', userSchema);
 const FreightOrder = db.model('FreightOrder', freightOrderSchema);
 
 Api.post('/register', async(ctx) => {
-    const {username, password, phone, userType} = ctx.request.body;
+    const {username, password, phone, userType,email} = ctx.request.body;
     if (!username || !password || !phone) {
         ctx.body = {
             Status: 0,
@@ -43,13 +43,15 @@ Api.post('/register', async(ctx) => {
             setCookie(ctx, phone, password);
             ctx.body = {
                 Status: 1,
-                Message: '注册成功'
+                Message: '注册成功',
+                Data:{username, email, phone, userType}
             };
         })
         .catch(e => {
+            setCookie(ctx, phone, password);
             ctx.body = {
                 Status: 0,
-                Message: '注册失败',
+                Message: e,
                 Data: e
             };
         })
@@ -91,7 +93,7 @@ Api.post('/login', async(ctx) => {
             return ctx.body = {
                 Status: 1,
                 Message: '登录成功',
-                data: res
+                Data: res
             };
 
         })
@@ -240,7 +242,6 @@ Api.post('/requestChatroomAddr', async(ctx) => {
 
 //挂载路由
 router.use('/api/v1', function (ctx, next) {
-    console.log(ctx.cookies.get('login_sign', 12))
     return next();
 }).use('/api/v1', Api.routes(), Api.allowedMethods());
 
