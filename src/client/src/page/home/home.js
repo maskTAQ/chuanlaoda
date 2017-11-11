@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
-import {Dialog, FlatButton} from 'material-ui';
+import { Dialog, FlatButton } from 'material-ui';
 import Slider from 'react-slick';
 
 import Loading from 'components/loading/loading.js';
 import List from 'components/list/list.js';
-import {Api} from 'src/config.js';
+import { Api } from 'src/config.js';
 import styles from './home.scss';
 
 class Home extends Component {
@@ -21,7 +21,7 @@ class Home extends Component {
         message: ''
     };
     componentWillMount() {
-        const {status} = this.props.orders;
+        const { status } = this.props.orders;
         //如果store有数据就直接取 没有则获取
         if (status !== 'success') {
             this
@@ -43,11 +43,11 @@ class Home extends Component {
         });
     }
     handleOpen = () => {
-        this.setState({open: true});
+        this.setState({ open: true });
     };
 
     handleClose = () => {
-        this.setState({open: false});
+        this.setState({ open: false });
     };
     retryGetOrders() {
         this.handleClose();
@@ -56,9 +56,8 @@ class Home extends Component {
             .getOrders();
     }
     render() {
-        console.log(this,'home')
-        const {status, data} = this.state;
-        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose}/>), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders}/>)];
+        const { status, data } = this.state;
+        const actions = [(<FlatButton label="取消" primary={true} onClick={this.handleClose} />), (<FlatButton label="重试" primary={true} onClick={this.retryGetOrders} />)];
         switch (status) {
             case 'success':
                 return (
@@ -67,12 +66,12 @@ class Home extends Component {
                             <div>应用开发中...</div>
                             <div>敬请期待</div>
                         </Slider>
-                        <List data={data}/>
+                        <List data={data} />
                     </div>
                 );
             case 'init':
             case 'loading':
-                return (<Loading label={status}/>);
+                return (<Loading label={status} />);
             default:
                 return (
                     <div className={styles.container} ref="containerList">
@@ -92,8 +91,8 @@ class Home extends Component {
 
 // Map Redux state to component props
 function mapStateToProps(state) {
-    const {orders,userInfo} = state;
-    return {orders,userInfo}
+    const { orders, userInfo } = state;
+    return { orders, userInfo }
 }
 
 // Map Redux actions to component props
@@ -109,7 +108,7 @@ function mapDispatchToProps(dispatch) {
             axios
                 .get(`${Api}/getOrders`)
                 .then(res => {
-                    const {Data, Status, Message} = res.data;
+                    const { Data, Status, Message } = res.data;
                     if (!Status) {
                         dispatch({
                             type: 'getOrders',

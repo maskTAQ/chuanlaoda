@@ -1,13 +1,11 @@
-import React, {Component} from 'react';
-//import { FlatButton, FontIcon } from 'material-ui';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 
 import Loading from 'components/loading/loading.js';
 import styles from './me.scss';
 
-import avatorSrc from './avator.png';
 moment.locale('zh-cn');
 class Me extends Component {
     static defaultProps = {
@@ -24,8 +22,19 @@ class Me extends Component {
         ]
     };
     componentWillMount() {
-        const {userInfo} = this.props;
-        if (!userInfo.username) {
+        const { status } = this.props.userInfo;
+        if (status === 'error') {
+            this
+                .props
+                .history
+                .push('/login', {
+                    form: 'me',
+                    to: 'login'
+                });
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.userInfo.status === 'error') {
             this
                 .props
                 .history
@@ -36,27 +45,34 @@ class Me extends Component {
         }
     }
     render() {
-        const {username} = this.props.userInfo;
-        return (
-            <div className={styles['me-container']}>
-                <div className={styles.header}>
-                    <h2 className={styles.welcome}>你好,{username}!</h2>
-                    <div className={styles.avatar}></div>
-                </div>
-                {this.renderList()
-}
-            </div>
-        )
+        const { status, data } = this.props.userInfo;
+        switch (status) {
+            case 'init':
+                return (<Loading />);
+            case 'success':
+            default:
+                return (
+                    <div className={styles['me-container']}>
+                        <div className={styles.header}>
+                            <h2 className={styles.welcome}>你好,{data.username}!</h2>
+                            <div className={styles.avatar}></div>
+                        </div>
+                        {this.renderList()
+                        }
+                    </div>
+                );
+        }
+
     }
     renderList() {
-        const {unreadMessages} = this.props;
+        const { unreadMessages } = this.props;
         const l = unreadMessages.length;
         if (l) {
             return (
                 <div className={styles.list}>
                     <p className={styles.title}>{l}条与您有关的消息!</p>
                     {unreadMessages.map(item => {
-                        const {username, time, message} = item;
+                        const { username, time, message } = item;
                         return (
                             <div className={styles.item} key={time + username}>
                                 <div className={styles.border}></div>
@@ -81,8 +97,8 @@ class Me extends Component {
 }
 
 function mapStateToProps(state) {
-    const {userInfo} = state;
-    return {userInfo};
+    const { userInfo } = state;
+    return { userInfo };
 }
 
 export default connect(mapStateToProps, null)(Me)

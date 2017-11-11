@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import {TextField, RaisedButton} from 'material-ui';
-import {Link} from 'react-router-dom';
+import React, { Component } from 'react';
+import { TextField, RaisedButton } from 'material-ui';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 import paramStringify from 'utils/paramStringify.js';
-import {Api} from 'src/config.js';
+import { Api } from 'src/config.js';
 import styles from './login.scss';
 import Validator from 'utils/formVerify.js';
 
@@ -21,15 +21,8 @@ class Login extends Component {
     login = () => {
         const verifyResult = this.verifyValue();
         if (verifyResult) {
-            axios.post(`${Api}/login`, paramStringify(this.state), {
-                //当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
-                withCredentials: 'credentials'
-            }).then(({data}) => {
-                const {Status, Message, Data} = data;
-                if (Status) {
-                    this
-                        .props
-                        .set_userInfo(Data);
+            this.props.login(this.state)
+                .then(res => {
                     this
                         .props
                         .history
@@ -37,16 +30,36 @@ class Login extends Component {
                             from: '/login',
                             to: '/home'
                         });
-                } else {
-                    alert(Message)
-                }
-            }).catch(e => {
-                alert('登录失败')
-            });
+                })
+                .catch(e => {
+                    alert(e)
+                })
+            // axios.post(`${Api}/login`, paramStringify(this.state), {
+            //     //当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
+            //     withCredentials: 'credentials'
+            // }).then(({ data }) => {
+            //     const { Status, Message, Data } = data;
+            //     if (Status) {
+            //         this
+            //             .props
+            //             .set_userInfo(Data);
+            //         this
+            //             .props
+            //             .history
+            //             .push('/home', {
+            //                 from: '/login',
+            //                 to: '/home'
+            //             });
+            //     } else {
+            //         alert(Message)
+            //     }
+            // }).catch(e => {
+            //     alert('登录失败')
+            // });
         }
     }
     verifyValue(values) {
-        const {password, phoneOrEmail} = Object.assign(this.state, values);
+        const { password, phoneOrEmail } = Object.assign(this.state, values);
         let result = true;
 
         const validator = new Validator();
@@ -61,12 +74,12 @@ class Login extends Component {
         ], (e) => {
             if (e.length === 2) {
                 result = false;
-                this.setState({phoneOrEmailErrorText: e[0]});
+                this.setState({ phoneOrEmailErrorText: e[0] });
             } else {
                 if (e[0] === '请输入手机号') {
-                    this.setState({email: phoneOrEmail, phoneOrEmailErrorText: ''});
+                    this.setState({ email: phoneOrEmail, phoneOrEmailErrorText: '' });
                 } else {
-                    this.setState({phone: phoneOrEmail, phoneOrEmailErrorText: ''});
+                    this.setState({ phone: phoneOrEmail, phoneOrEmailErrorText: '' });
                 }
             }
         });
@@ -85,7 +98,7 @@ class Login extends Component {
             });
         });
         if (result) {
-            this.setState({passwordErrorText: ''});
+            this.setState({ passwordErrorText: '' });
         }
 
         validator.start();
@@ -93,11 +106,11 @@ class Login extends Component {
         return result;
     }
     onValueChange(type, value) {
-        this.setState({[type]: value});
-        this.verifyValue({[type]: value});
+        this.setState({ [type]: value });
+        this.verifyValue({ [type]: value });
     }
     render() {
-        const {password, passwordErrorText, phoneOrEmail, phoneOrEmailErrorText} = this.state;
+        const { password, passwordErrorText, phoneOrEmail, phoneOrEmailErrorText } = this.state;
 
         return (
             <div className={styles['container-login']}>
@@ -111,8 +124,8 @@ class Login extends Component {
                         errorText={phoneOrEmailErrorText}
                         value={phoneOrEmail}
                         onChange={(proxy, v) => {
-                        this.onValueChange('phoneOrEmail', v)
-                    }}/>
+                            this.onValueChange('phoneOrEmail', v)
+                        }} />
                     <TextField
                         floatingLabelText="密码"
                         hintText="请输入密码"
@@ -120,13 +133,13 @@ class Login extends Component {
                         value={password}
                         errorText={passwordErrorText}
                         onChange={(proxy, v) => {
-                        this.onValueChange('password', v)
-                    }}/>
+                            this.onValueChange('password', v)
+                        }} />
                 </div>
                 <div className={styles.register}>
                     <Link to="/register">没有账号?点我注册</Link>
                 </div>
-                <RaisedButton label="登录" className={styles.button} onClick={this.login}/>
+                <RaisedButton label="登录" className={styles.button} onClick={this.login} />
             </div>
         )
     }
@@ -134,14 +147,48 @@ class Login extends Component {
 }
 
 function mapStateToProps(state) {
-    const {userInfo} = state;
+    const { userInfo } = state;
 
-    return {userInfo}
+    return { userInfo }
 }
 function mapDispatchToProps(dispatch) {
     return {
-        set_userInfo(userInfo) {
-            dispatch({type: 'set_userInfo', data: userInfo});
+        login(data) {
+            let axiosInfo = {
+                type: 'get',
+                url: `${Api}/getloginstatus`,
+                data: ''
+            };
+            if (data) {
+                axiosInfo = {
+                    type: 'post',
+                    url: `${Api}/login`,
+                    data: paramStringify(data)
+                };
+
+            }
+            return axios({
+                method: axiosInfo.type,
+                url: axiosInfo.url,
+                data: axiosInfo.data,
+                //当我们在发送跨域请求时，request 的 credentials属性表示是否允许其他域发送cookie，
+                withCredentials: 'credentials'
+            })
+                .then(({ data }) => {
+                    const { Status, Data, Message } = data;
+                    if (Status) {
+                        dispatch({ type: 'set_userInfo', data: {status: 'success', data: Data } });
+                        return Promise.resolve();
+
+                    } else {
+                        dispatch({ type: 'set_userInfo', data: { status: 'error', data: Message } });
+                        return Promise.reject(Message);
+                    }
+                })
+                .catch(e => {
+                    dispatch({ type: 'set_userInfo', data: { status: 'error', data: e.toString() } });
+                    return Promise.reject(e.toString());
+                })
         }
     }
 }

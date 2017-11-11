@@ -15,13 +15,12 @@ export default class ChatRoom extends Component {
         message:'-'
     };
     componentDidMount() {
-        // setTimeout(()=>{
-        //     this.initChatroom()
-        // },1000)
+        
     }
     initChatroom = () => {
         const { appKey, chatroomId, chatroomAddresses, account, token } = config;
         const { user } = this.state;
+        
         const users = {
             test: 'e1a798af33cac26c284e4f2344be251e',
             test1: '3e562f60c6ebc35df8fcc352737fc73f',
@@ -44,10 +43,11 @@ export default class ChatRoom extends Component {
         });
     }
     join(res) {
-        console.log(res, '进入聊天室')
+        console.log(res, '进入聊天室');
     }
     sendMessage=()=>{
         const {message} = this.state;
+        console.log()
         this.chatroom.sendText({
             text: message,
             done(error, msg) {
@@ -56,6 +56,7 @@ export default class ChatRoom extends Component {
         });
     }
     onmsgs(res) {
+        res.type
         console.log(res, '接收到消息')
     }
     onUsernameChange=(e)=> {

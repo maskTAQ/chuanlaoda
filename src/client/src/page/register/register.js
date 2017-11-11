@@ -319,7 +319,7 @@ class Register extends Component {
 function mapDispatchToProps(dispatch) {
     return {
         set_userInfo(userInfo) {
-            dispatch({type: 'set_userInfo', data: userInfo});
+            dispatch({type: 'set_userInfo', data: {status:'success',data:userInfo}});
         }
     }
 }
