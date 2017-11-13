@@ -54,6 +54,16 @@ class MarKet extends Component {
     handleClose = () => {
         this.setState({isDialogVisible: false});
     };
+    handleOrderClick=(data)=>{
+        this
+        .props
+        .history
+        .push('/detail', {
+            from: '/market',
+            to: '/detail',
+            data
+        });
+    }
     retryGetOrders = () => {
         this.handleClose();
         this
@@ -101,7 +111,8 @@ class MarKet extends Component {
                             this
                                 .props
                                 .toggleBottomNav('hide');
-                        }}/>
+                        }}
+                        onItemClick={this.handleOrderClick}/>
                         <IconButton
                             className={styles['add-order']}
                             iconStyle={{

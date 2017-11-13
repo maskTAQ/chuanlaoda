@@ -49,7 +49,7 @@ class Home extends Component {
     handleClose = () => {
         this.setState({ open: false });
     };
-    retryGetOrders() {
+    retryGetOrders=()=> {
         this.handleClose();
         this
             .props
